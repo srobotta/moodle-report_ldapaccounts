@@ -180,8 +180,8 @@ class report_form extends \moodleform {
         if (isset($data->filter_lastname) && !empty(trim($data->filter_lastname))) {
             $filter['lastname'] = trim($data->filter_lastname) . '*';
         }
-        if (isset($data->filter_lastname) && !empty(trim($data->filter_lastname))) {
-            $filter['email'] = trim($data->filter_lastname) . '*';
+        if (isset($data->filter_email) && !empty(trim($data->filter_email))) {
+            $filter['email'] = trim($data->filter_email) . '*';
         }
         return json_encode($filter);
     }
