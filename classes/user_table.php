@@ -45,7 +45,7 @@ class user_table
     /**
      * @var bool
      */
-    private $showActionDisable = false;
+    private $showActionNotification = false;
 
     /**
      * @var array
