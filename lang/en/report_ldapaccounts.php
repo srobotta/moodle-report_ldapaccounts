@@ -63,4 +63,5 @@ $string['ldapuser'] = 'LDAP username';
 $string['pluginname'] = 'Moodle Accounts in LDAP';
 $string['privacy:metadata'] = 'Moodle Accounts in LDAP does not store any personal data';
 $string['reportldapaccountsdesc'] = 'Select accounts in Moodle and check whether these exist in LDAP.';
+$string['resultcount'] = '{0} Entries found.';
 $string['settings'] = 'Settings for Moodle Accounts in LDAP Report';

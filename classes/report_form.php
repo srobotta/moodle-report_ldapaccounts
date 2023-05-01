@@ -93,7 +93,7 @@ class report_form extends \moodleform {
             $name,
             get_string('form_' . $name, 'report_ldapaccounts'),
             [
-                -1 => ' ',
+                -1 => get_string('all', 'search'),
                 0 => '0',
                 1 => '1',
             ]
@@ -139,7 +139,7 @@ class report_form extends \moodleform {
         global $DB;
 
         if ($this->authmethods === null) {
-            $this->authmethods = [-1 => ' '];
+            $this->authmethods = [-1 => get_string('all', 'search')];
             $i = 0;
             $res = $DB->get_records_sql('SELECT DISTINCT(auth) FROM {user}');
             foreach($res as $row) {

@@ -65,8 +65,17 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
         ->setShowActionNotification(true)
         ->setShowActionProfile(true);
 
+    $first = true;
     while (true) {
         $result = $userquery->getUsers();
+        if ($first) {
+            echo $OUTPUT->box(str_replace(
+                '{0}',
+                $userquery->getRecordCount(),
+                get_string('resultcount', 'report_ldapaccounts')
+            ));
+            $first = false;
+        }
         if (empty($result)) {
             break;
         }

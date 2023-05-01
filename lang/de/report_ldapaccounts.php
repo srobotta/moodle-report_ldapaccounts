@@ -51,3 +51,4 @@ $string['ldapmailfield'] = 'E-Mail Feld in LDAP';
 $string['ldapmailfield_desc'] = 'Der Name des Feldes in LDAP in welchem die Mailadresse der Person gespeichert wird.';
 $string['ldapquery'] = 'LDAP Abfrage';
 $string['ldapquery_desc'] = 'Feste Abfrage an LDAP um Nutzer auszuwählen (z.B. `(&(objectClass=person)(objectClass=top))`). Diese Abfrage wird mit der email aus dem Benutzerdatensatz erweitert.';
+$string['resultcount'] = '{0} Einträge gefunden.';
