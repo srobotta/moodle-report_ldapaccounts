@@ -54,6 +54,7 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
     $ldap = \report_ldapaccounts\ldap::initFromConfig();
     $ldapmailfield = \report_ldapaccounts\config::getInstance()->getSetting('ldapmailfield');
     $ldapquerypart = \report_ldapaccounts\config::getInstance()->getSetting('ldapquery');
+    $filterldapstatus = $mform->getFilterLdapStatus();
     $userquery = $mform->getUserQuery();
     $userquery->setSelectedFields(array_unique(array_merge($userquery->getSelectedFields(), ['deleted', 'suspended', 'emailstop'])));
     $colstoshow = $mform->getSubmittedSelectFields();
@@ -65,7 +66,7 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
         ->setShowActionNotification(true)
         ->setShowActionProfile(true);
 
-    $first = true;
+    $first = $filterldapstatus === -1; // Do not show this when LDAP status is set because this number refers to the moodle db only.
     while (true) {
         $result = $userquery->getUsers();
         if ($first) {
@@ -95,7 +96,9 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
         }
         foreach ($result as $user) {
             $user->ldap_status = $userinldap[$user->email];
-            $table->addTableRow($user);
+            if ($filterldapstatus === -1 || $filterldapstatus === $user->ldap_status) {
+                $table->addTableRow($user);
+            }
         }
         $userquery->setNextPage();
     }

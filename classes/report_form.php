@@ -38,7 +38,6 @@ class report_form extends \moodleform {
      * Define the form.
      */
     protected function definition() {
-        global $CFG, $DB;
         $this->_form->addElement(
             'html',
             '<h4>' . get_string('form_filter_userdata', 'report_ldapaccounts'). '</h4>'
@@ -61,6 +60,7 @@ class report_form extends \moodleform {
         $this->_form->setType('filter_lastname', PARAM_ALPHA);
         $this->_form->addElement('text', 'filter_email', $this->_s('form_filter_email'));
         $this->_form->setType('filter_email', PARAM_RAW_TRIMMED);
+        $this->addAnyNoYes('filter_ldapstatus');
 
         $this->_form->addElement('html', '<div class=""><h4>' . $this->_s('form_show_userdata'). '</h4>');
         $this->_form->addElement('textarea', 'show_cols', $this->_s('form_show_cols'), ['rows' => 6])
@@ -93,7 +93,7 @@ class report_form extends \moodleform {
             $name,
             get_string('form_' . $name, 'report_ldapaccounts'),
             [
-                -1 => get_string('all', 'search'),
+                -1 => get_string('any'),
                 0 => '0',
                 1 => '1',
             ]
@@ -139,7 +139,7 @@ class report_form extends \moodleform {
         global $DB;
 
         if ($this->authmethods === null) {
-            $this->authmethods = [-1 => get_string('all', 'search')];
+            $this->authmethods = [-1 => get_string('any')];
             $i = 0;
             $res = $DB->get_records_sql('SELECT DISTINCT(auth) FROM {user}');
             foreach($res as $row) {
@@ -184,6 +184,18 @@ class report_form extends \moodleform {
             $filter['email'] = trim($data->filter_email) . '*';
         }
         return json_encode($filter);
+    }
+
+    /**
+     * @return int
+     */
+    public function getFilterLdapStatus(): int
+    {
+        if (!$this->is_submitted()) {
+            return -1;
+        }
+        $data = $this->get_data();
+        return isset($data->filter_ldapstatus) ? (int)$data->filter_ldapstatus : -1;
     }
 
     /**

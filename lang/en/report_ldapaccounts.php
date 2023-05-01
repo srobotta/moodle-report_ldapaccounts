@@ -32,6 +32,7 @@ $string['form_filter_email'] = 'E-Mail';
 $string['form_filter_emailstop'] = 'Emailstop';
 $string['form_filter_firstname'] = 'Firstname';
 $string['form_filter_lastname'] = 'Lastname';
+$string['form_filter_ldapstatus'] = 'LDAP Status';
 $string['form_filter_suspended'] = 'Suspended';
 $string['form_filter_userdata'] = 'Filter user data';
 $string['form_show_cols'] = 'Columns';
