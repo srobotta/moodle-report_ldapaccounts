@@ -25,10 +25,11 @@
 
 namespace report_ldapaccounts;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->libdir.'/adminlib.php');
 
-class config
-{
+class config {
     /**
      * Singleton instance is stored here.
      * @var config
@@ -64,8 +65,7 @@ class config
      * Get singleton of class.
      * @return config
      */
-    public static function getInstance(): config
-    {
+    public static function get_instance(): config {
         if (self::$instance === null) {
             self::$instance = new self();
         }
@@ -77,8 +77,7 @@ class config
      * @return array
      * @throws \dml_exception
      */
-    private function getValues(): array
-    {
+    private function get_values(): array {
         if ($this->values === null) {
             $this->values = [];
             $stored = get_config('report_ldapaccounts');
@@ -88,7 +87,7 @@ class config
                 $this->values[$shortkey] = (isset($stored->{$key}) && !empty($stored->{$key}))
                     ? $stored->{$key}
                     : $default;
-                if ($key === 'ldapport') { // port needs to be an int to be typesafe later.
+                if ($key === 'ldapport') { // Port needs to be an int to be typesafe later.
                     $this->values[$shortkey] = (int)$this->values[$shortkey];
                 }
             }
@@ -103,8 +102,8 @@ class config
      * @return mixed|null
      * @throws \dml_exception
      */
-    public function getSetting(string $name) {
-        return $this->getValues()[$name] ?? null;
+    public function get_setting(string $name) {
+        return $this->get_values()[$name] ?? null;
     }
 
     /**
@@ -112,9 +111,8 @@ class config
      * @return array
      * @throws \dml_exception
      */
-    public function getSettingsAsArray(): array
-    {
-        return $this->getValues();
+    public function get_settings_as_array(): array {
+        return $this->get_values();
     }
 
     /**
@@ -122,9 +120,8 @@ class config
      * @return \stdClass
      * @throws \dml_exception
      */
-    public function getSettingsAsObject(): \stdClass
-    {
-        return (object)$this->getValues();
+    public function get_settings_as_object(): \stdClass {
+        return (object)$this->get_values();
     }
 
     /**
@@ -133,7 +130,7 @@ class config
      * @return void
      * @throws \coding_exception
      */
-    public function addConfigToSettingsPage(\admin_settingpage $settings): void {
+    public function add_config_to_settings_page(\admin_settingpage $settings): void {
         foreach ($this->settingsanddefaults as $key => $defaultval) {
             $settings->add(new \admin_setting_configtext(
                 'report_ldapaccounts/' . $key,

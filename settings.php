@@ -34,7 +34,7 @@ $settings = new admin_settingpage(
 );
 
 if ($ADMIN->fulltree) {
-    \report_ldapaccounts\config::getInstance()->addConfigToSettingsPage($settings);
+    \report_ldapaccounts\config::get_instance()->add_config_to_settings_page($settings);
 }
 
 

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -81,7 +80,7 @@ Options:
                 with this users email address. In case an action is used, the users are written to stdout
                 only if the action has been applied to the user and the data has been modified.
 -d, --delimiter CSV delimiter, can be one of ; , | ~ : tab
-                If not set, the semicolon is used. 
+                If not set, the semicolon is used.
 -f, --filter    Filter which users to select. Think of an array such as:
                 only active users: ['deleted' => 0]
                 only users with email ending in @example.org: ['email' => '*example.org']
@@ -113,7 +112,7 @@ if (!in_array($csvdelimiter, [';', ',', '|', '~', ':', "\t"])) {
     exit($exitinvaliddelimiter);
 }
 
-$queryuserfields =  ['id', 'email', 'firstname', 'lastname'];
+$queryuserfields = ['id', 'email', 'firstname', 'lastname'];
 
 $action = $options['action'] ?: null;
 if (!empty($action)) {
@@ -125,22 +124,22 @@ if (!empty($action)) {
     }
     if ($action === 'delete') {
         $action .= 'd';
-    } elseif ($action === 'suspend') {
+    } else if ($action === 'suspend') {
         $action .= 'ed';
     }
     $queryuserfields[] = $action;
 }
 
 
-$ldapmailfield = $options['ldapmail'] ?: \report_ldapaccounts\config::getInstance()->getSetting('ldapmailfield');
+$ldapmailfield = $options['ldapmail'] ?: \report_ldapaccounts\config::get_instance()->get_setting('ldapmailfield');
 
 
 // Prepare query for users in Moodle db.
 $query = new \report_ldapaccounts\user_query($queryuserfields);
-$query->setPageSize(100);
+$query->set_page_size(100);
 if (isset($options['filter'])) {
     try {
-        $query->setFilterFromJson($options['filter']);
+        $query->set_filter_json($options['filter']);
     } catch (\RuntimeException $e) {
         if ($verbose) {
             echo $e->getMessage() . PHP_EOL;
@@ -150,7 +149,7 @@ if (isset($options['filter'])) {
 }
 
 // Initialize ldap query.
-$ldap = \report_ldapaccounts\ldap::initFromConfig();
+$ldap = \report_ldapaccounts\ldap::init_from_config();
 // Write to stdout.
 if ($verbose) {
     $fp = fopen('php://stdout', 'w');
@@ -158,7 +157,7 @@ if ($verbose) {
 $csvheader = false;
 while (1) {
     $idstoupdate = [];
-    $result = $query->getUsers();
+    $result = $query->get_users();
     if (empty($result)) {
         break;
     }
@@ -167,7 +166,7 @@ while (1) {
         $userinldap[$user->email] = 0;
     }
     try {
-        $ldapres = $ldap->search([$ldapmailfield => array_keys($userinldap)], $ldapmailfield)->getParsedResult();
+        $ldapres = $ldap->search([$ldapmailfield => array_keys($userinldap)], $ldapmailfield)->get_parsed_result();
     } catch (\RuntimeException $e) {
         if ($verbose) {
             cli_error($e->getMessage(), $exiterrorldap);
@@ -204,7 +203,7 @@ while (1) {
             fputcsv($fp, $fields, $csvdelimiter);
         }
     }
-    $query->setNextPage();
+    $query->set_next_page();
     if (!empty($idstoupdate) && !empty($action)) {
         $sql = 'UPDATE {user} '
             . ' SET '. $action . ' = 1, timemodified = ' . time()

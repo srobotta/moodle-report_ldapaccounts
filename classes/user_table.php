@@ -25,27 +25,27 @@
 
 namespace report_ldapaccounts;
 
-class user_table
-{
-    /**
-     * @var bool
-     */
-    private $showHeader = false;
+class user_table {
 
     /**
      * @var bool
      */
-    private $showActionProfile = false;
+    private $showheader = false;
 
     /**
      * @var bool
      */
-    private $showActionDelete = false;
+    private $showactionprofile = false;
 
     /**
      * @var bool
      */
-    private $showActionNotification = false;
+    private $showactiondelete = false;
+
+    /**
+     * @var bool
+     */
+    private $showactionnotification = false;
 
     /**
      * @var array
@@ -65,60 +65,57 @@ class user_table
     }
 
     /**
-     * @param bool $showActionProfile
+     * @param bool $val
      */
-    public function setShowActionProfile(bool $showActionProfile): user_table {
-        $this->showActionProfile = $showActionProfile;
+    public function set_show_action_profile(bool $val): user_table {
+        $this->showactionprofile = $val;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function isShowActionProfile(): bool
-    {
-        return $this->showActionProfile;
+    public function is_show_action_profile(): bool {
+        return $this->showactionprofile;
     }
 
     /**
      * @param bool $val
      * @return user_table
      */
-    public function setShowActionDelete(bool $val): user_table {
-        $this->showActionDelete = $val;
+    public function set_show_action_delete(bool $val): user_table {
+        $this->showactiondelete = $val;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function isShowActionDelete(): bool
-    {
-        return $this->showActionDelete;
+    public function is_show_action_delete(): bool {
+        return $this->showactiondelete;
     }
 
     /**
      * @param bool $val
      * @return user_table
      */
-    public function setShowActionNotification(bool $val): user_table {
-        $this->showActionNotification = $val;
+    public function set_show_action_notification(bool $val): user_table {
+        $this->showactionnotification = $val;
         return $this;
     }
 
     /**
      * @return bool
      */
-    public function isShowActionNotification(): bool
-    {
-        return $this->showActionNotification;
+    public function is_show_action_notification(): bool {
+        return $this->showactionnotification;
     }
 
     /**
      * @param array $cols
      * @return user_table
      */
-    public function setColumns(array $cols): user_table {
+    public function set_columns(array $cols): user_table {
         $keys = array_flip($cols);
         // Never ever display contents of password and secret.
         if (isset($keys['password'])) {
@@ -136,7 +133,7 @@ class user_table
      * @return user_table
      * @throws \coding_exception
      */
-    public function addTableRow(\stdClass $user): user_table {
+    public function add_table_row(\stdClass $user): user_table {
         global $CFG;
 
         if ($this->colunms === null) {
@@ -151,17 +148,17 @@ class user_table
                 $row[] = $user->{$col} ?? '';
             }
         }
-        if ($this->showActionProfile) {
+        if ($this->showactionprofile) {
             $row[] = '<a href="' . $CFG->httpswwwroot . '/user/profile.php?id=' . $user->id . '" target="blank">'
                 . get_string('userdetails', 'core') . '</a>';
         }
-        if ($this->showActionDelete) {
+        if ($this->showactiondelete) {
             $row[] = (int)$user->deleted === 1 ? '' :
                 '<a href="' . $CFG->httpswwwroot . '/admin/user.php?sort=name&dir=ASC&perpage=30&page=0&delete='
                     . $user->id . '&sesskey=' . sesskey() . '" target="blank">'
                     . get_string('delete', 'core') . '</a>';
         }
-        if ($this->showActionNotification) {
+        if ($this->showactionnotification) {
             $row[] = (int)$user->emailstop === 1 ? '' :
                 '<a href="' . $CFG->httpswwwroot . '/message/notificationpreferences.php?userid='
                     . $user->id . '" target="blank">' . get_string('emailstop', 'core') . '</a>';
@@ -175,8 +172,8 @@ class user_table
      * @return $this
      * @throws \coding_exception
      */
-    public function enableHeader(bool $val): user_table {
-        $this->showHeader = $val;
+    public function enable_header(bool $val): user_table {
+        $this->show_header = $val;
         return $this;
     }
 
@@ -184,7 +181,7 @@ class user_table
      * @return user_table
      * @throws \coding_exception
      */
-    protected function buildHeaderRow(): user_table {
+    protected function build_header_row(): user_table {
         if ($this->colunms === null) {
             throw new \RuntimeException('columns must be set first');
         }
@@ -194,19 +191,19 @@ class user_table
         foreach ($this->colunms as $col) {
             if ($col === 'id') {
                 $totalheadertitles[] = 'ID';
-            } elseif ($col === 'ldap_status') {
+            } else if ($col === 'ldap_status') {
                 $totalheadertitles[] = get_string('form_col_ldap_status', 'report_ldapaccounts');
             } else {
                 $totalheadertitles[] = get_string($col, 'core');
             }
         }
-        if ($this->showActionProfile) {
+        if ($this->showactionprofile) {
             $totalheadertitles[] = get_string('userdetails', 'core');
         }
-        if ($this->showActionDelete) {
+        if ($this->showactiondelete) {
             $totalheadertitles[] = get_string('delete', 'core');
         }
-        if ($this->showActionNotification) {
+        if ($this->showactionnotification) {
             $totalheadertitles[] = get_string('emailstop', 'core');
         }
         foreach ($totalheadertitles as $totalheadertitle) {
@@ -223,9 +220,9 @@ class user_table
      * Write the table using the html_writer.
      * @return void
      */
-    public function outputTable(): void {
-        if ($this->showHeader) {
-            $this->buildHeaderRow();
+    public function output_table(): void {
+        if ($this->show_header) {
+            $this->build_header_row();
         }
         echo \html_writer::table($this->table);
     }

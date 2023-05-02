@@ -51,28 +51,31 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
     echo $OUTPUT->heading(get_string('pluginname', 'report_ldapaccounts'));
     echo $OUTPUT->box(get_string('reportldapaccountsdesc', 'report_ldapaccounts') . "<br />&#160;", 'generalbox');
 
-    $ldap = \report_ldapaccounts\ldap::initFromConfig();
-    $ldapmailfield = \report_ldapaccounts\config::getInstance()->getSetting('ldapmailfield');
-    $ldapquerypart = \report_ldapaccounts\config::getInstance()->getSetting('ldapquery');
-    $filterldapstatus = $mform->getFilterLdapStatus();
-    $userquery = $mform->getUserQuery();
-    $userquery->setSelectedFields(array_unique(array_merge($userquery->getSelectedFields(), ['deleted', 'suspended', 'emailstop'])));
-    $colstoshow = $mform->getSubmittedSelectFields();
+    $ldap = \report_ldapaccounts\ldap::init_from_config();
+    $ldapmailfield = \report_ldapaccounts\config::get_instance()->get_setting('ldapmailfield');
+    $ldapquerypart = \report_ldapaccounts\config::get_instance()->get_setting('ldapquery');
+    $filterldapstatus = $mform->get_filter_ldapstatus();
+    $userquery = $mform->get_user_query();
+    $userquery->set_selected_fields(array_unique(array_merge(
+        $userquery->get_selected_fields(),
+        ['deleted', 'suspended', 'emailstop'])
+    ));
+    $colstoshow = $mform->get_submitted_select_fields();
     array_splice($colstoshow, array_search('id', $colstoshow) + 1, 0, ['ldap_status']);
     $table = new \report_ldapaccounts\user_table();
-    $table->setColumns($colstoshow)
-        ->enableHeader(true)
-        ->setShowActionDelete(true)
-        ->setShowActionNotification(true)
-        ->setShowActionProfile(true);
+    $table->set_columns($colstoshow)
+        ->enable_header(true)
+        ->set_show_action_delete(true)
+        ->set_show_action_profile(true)
+        ->set_show_action_notification(true);
 
     $first = $filterldapstatus === -1; // Do not show this when LDAP status is set because this number refers to the moodle db only.
     while (true) {
-        $result = $userquery->getUsers();
+        $result = $userquery->get_users();
         if ($first) {
             echo $OUTPUT->box(str_replace(
                 '{0}',
-                $userquery->getRecordCount(),
+                $userquery->get_record_count(),
                 get_string('resultcount', 'report_ldapaccounts')
             ));
             $first = false;
@@ -86,7 +89,7 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
         }
         try {
             $ldapres = $ldap->search([$ldapmailfield => array_keys($userinldap)], $ldapmailfield, $ldapquerypart)
-                ->getParsedResult();
+                ->get_parsed_result();
         } catch (\RuntimeException $e) {
             echo $OUTPUT->box($e->getMessage(), 'generalbox');
             break;
@@ -97,13 +100,13 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
         foreach ($result as $user) {
             $user->ldap_status = $userinldap[$user->email];
             if ($filterldapstatus === -1 || $filterldapstatus === $user->ldap_status) {
-                $table->addTableRow($user);
+                $table->add_table_row($user);
             }
         }
-        $userquery->setNextPage();
+        $userquery->set_next_page();
     }
 
-    $table->outputTable();
+    $table->output_table();
     $mform->display();
 } else {
     // Form was not submitted yet.

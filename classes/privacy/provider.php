@@ -25,8 +25,6 @@
 
 namespace report_ldapaccounts\privacy;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Privacy API implementation for the Outdated accounts not in LDAP plugin.
  *

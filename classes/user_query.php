@@ -26,8 +26,7 @@
 
 namespace report_ldapaccounts;
 
-class user_query
-{
+class user_query {
 
     /**
      * List of fields to select.
@@ -78,13 +77,13 @@ class user_query
      */
     public function __construct(array $fields = null, array $filter = null, int $size = null) {
         if (is_array($fields)) {
-            $this->setSelectedFields($fields);
+            $this->set_selected_fields($fields);
         }
         if (is_array($filter)) {
             $this->filter = $filter;
         }
         if ($size !== null && $size >= 0) {
-            $this->setPageSize($size);
+            $this->set_page_size($size);
         }
     }
 
@@ -96,8 +95,8 @@ class user_query
      * @param array $filter
      * @return self
      */
-    public function setFilter(array $filter): self {
-        $this->validateFields(\array_keys($filter));
+    public function set_filter(array $filter): self {
+        $this->validate_fields(\array_keys($filter));
         $this->filter = $filter;
         $this->where = null;
         $this->maxrecords = null;
@@ -112,8 +111,7 @@ class user_query
      * @param string $json
      * @return self
      */
-    public function setFilterFromJson(string $json): self
-    {
+    public function set_filter_json(string $json): self {
         $data = json_decode($json, true);
         if (!\is_array($data)) {
             throw new \InvalidArgumentException('Invalid json provided');
@@ -126,14 +124,13 @@ class user_query
                 } else {
                     $filter[$key] = [substr($val, 1), substr($val, 0, 1)];
                 }
-            }
-            elseif (strpos($val,'*') !== false) {
+            } else if (strpos($val, '*') !== false) {
                 $filter[$key] = [str_replace('*', '%', str_replace('%', '%%', $val)), 'like'];
             } else {
                 $filter[$key] = $val;
             }
         }
-        $this->setFilter($filter);
+        $this->set_filter($filter);
         return $this;
     }
 
@@ -142,8 +139,8 @@ class user_query
      * @param array $fields
      * @return self
      */
-    public function setSelectedFields(array $fields): self {
-        $this->validateFields($fields);
+    public function set_selected_fields(array $fields): self {
+        $this->validate_fields($fields);
         $this->selectedfields = $fields;
         return $this;
     }
@@ -151,7 +148,7 @@ class user_query
     /**
      * @return array
      */
-    public function getSelectedFields(): array {
+    public function get_selected_fields(): array {
         return $this->selectedfields;
     }
 
@@ -160,7 +157,7 @@ class user_query
      * @param array $fields
      * @return void
      */
-    public function validateFields(array $fields): void {
+    public function validate_fields(array $fields): void {
         global $DB;
         static $cols;
 
@@ -178,7 +175,7 @@ class user_query
      * @param int $size
      * @return self
      */
-    public function setPageSize(int $size): self {
+    public function set_page_size(int $size): self {
         if ($size < 1) {
             throw new \InvalidArgumentException('size must be 1 or greater');
         }
@@ -190,7 +187,7 @@ class user_query
      * @param int $page
      * @return self
      */
-    public function setPage(int $page): self {
+    public function set_page(int $page): self {
         if ($page < 0) {
             throw new \InvalidArgumentException('page must be 0 or greater');
         }
@@ -202,8 +199,7 @@ class user_query
      * Get current page.
      * @return int
      */
-    public function getPage(): int
-    {
+    public function get_page(): int {
         return $this->page;
     }
 
@@ -211,8 +207,7 @@ class user_query
      * Autoincrement page to get the next chunk when running getUsers() again.
      * @return self
      */
-    public function setNextPage(): self
-    {
+    public function set_next_page(): self {
         $this->page++;
         return $this;
     }
@@ -221,10 +216,9 @@ class user_query
      * Get argument values for where clause.
      * @return array
      */
-    protected function getArgs(): array
-    {
+    protected function get_args(): array {
         if ($this->args === null) {
-            $this->getWhere();
+            $this->get_where();
         }
         return $this->args;
     }
@@ -234,19 +228,18 @@ class user_query
      * that are supposed to be used in the query.
      * @return string
      */
-    protected function getWhere(): string
-    {
+    protected function get_where(): string {
         if ($this->where === null) {
             $this->where = '1=1';
             $this->args = [];
             if (!empty($this->filter)) {
-                foreach($this->filter as $col => $val) {
+                foreach ($this->filter as $col => $val) {
                     $this->where .= ' AND ' . $col . ' ';
                     if (is_array($val)) {
                         $this->where .= $val[1] . ' :' . $col . ' ';
                         $this->args[$col] = $val[0];
                     } else {
-                        $this->where .=  '= :' . $col . ' ';
+                        $this->where .= '= :' . $col . ' ';
                         $this->args[$col] = $val;
                     }
                 }
@@ -260,19 +253,18 @@ class user_query
      * @return array
      * @throws \dml_exception
      */
-    public function getUsers(): array
-    {
+    public function get_users(): array {
         global $DB;
         if ($this->recordcnt === null) {
-            $this->recordcnt = $DB->count_records_select('user', $this->getWhere(), $this->getArgs());
+            $this->recordcnt = $DB->count_records_select('user', $this->get_where(), $this->get_args());
         }
         $cols = empty($this->selectedfields) ? '*' : implode(', ', $this->selectedfields);
-        $sql = 'SELECT ' . $cols . ' FROM {user} WHERE ' . $this->getWhere()
+        $sql = 'SELECT ' . $cols . ' FROM {user} WHERE ' . $this->get_where()
             . ' ORDER BY id';
         if ($this->size > 0) {
-            $users = $DB->get_records_sql($sql, $this->getArgs(), ($this->page - 1) * $this->size, $this->size);
+            $users = $DB->get_records_sql($sql, $this->get_args(), ($this->page - 1) * $this->size, $this->size);
         } else {
-            $users = $DB->get_records_sql($sql, $this->getArgs());
+            $users = $DB->get_records_sql($sql, $this->get_args());
         }
         // Set is empty property.
         $this->isempty = empty($users);
@@ -283,8 +275,7 @@ class user_query
      * Get number of all records.
      * @return int
      */
-    public function getRecordCount(): int
-    {
+    public function get_record_count(): int {
         return $this->recordcnt ?: 0;
     }
 }

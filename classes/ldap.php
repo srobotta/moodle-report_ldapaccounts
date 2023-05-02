@@ -27,8 +27,7 @@ namespace report_ldapaccounts;
 
 use LDAP\Connection;
 
-class ldap
-{
+class ldap {
 
     /**
      * LDAP username.
@@ -117,14 +116,14 @@ class ldap
      * @return ldap
      * @throws \dml_exception
      */
-    public static function initFromConfig(): ldap {
-        $cfg = config::getInstance()->getSettingsAsObject();
+    public static function init_from_config(): ldap {
+        $cfg = config::get_instance()->get_settings_as_object();
         $ldap = new self($cfg->server, $cfg->basedn, $cfg->user, $cfg->pass, $cfg->port);
         if (!empty($cfg->cert)) {
-            $ldap->setCertfile($cfg->cert);
+            $ldap->set_certfile($cfg->cert);
         }
         if (!empty($cfg->cacert)) {
-            $ldap->setCacertfile($cfg->cacert);
+            $ldap->set_cacertfile($cfg->cacert);
         }
         return $ldap;
     }
@@ -133,7 +132,7 @@ class ldap
      * @param string $certfile
      * @return ldap
      */
-    public function setCertfile(string $certfile): ldap {
+    public function set_certfile(string $certfile): ldap {
         $this->certfile = $certfile;
         return $this;
     }
@@ -142,8 +141,7 @@ class ldap
      * @param string $cacertfile
      * @return ldap
      */
-    public function setCacertfile(string $cacertfile): ldap
-    {
+    public function set_cacertfile(string $cacertfile): ldap {
         $this->cacertfile = $cacertfile;
         return $this;
     }
@@ -152,13 +150,13 @@ class ldap
      * Prior to PHP8.1 a resource is returned.
      * @return resource|Connection
      */
-    protected function getConnection() {
+    protected function get_connection() {
         if ($this->ldap === null) {
             if (!empty($this->certfile) && file_exists($this->certfile)) {
-                ldap_set_option(NULL, LDAP_OPT_X_TLS_CERTFILE, $this->certfile);
+                ldap_set_option(null, LDAP_OPT_X_TLS_CERTFILE, $this->certfile);
             }
             if (!empty($this->cacertfile)) {
-                ldap_set_option(NULL, LDAP_OPT_X_TLS_CACERTFILE, $this->cacertfile);
+                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $this->cacertfile);
             }
 
             $this->ldap = ldap_connect($this->server, $this->port);
@@ -190,10 +188,10 @@ class ldap
      */
     public function search($searchfields, $resultfields = null, string $fixedquerypart = null): ldap {
         $search = ldap_search(
-            $this->getConnection(),
+            $this->get_connection(),
             $this->basedn,
-            $fixedquerypart . $this->getFilter($searchfields),
-            $this->getResultFields($resultfields)
+            $fixedquerypart . $this->get_filter($searchfields),
+            $this->get_result_fields($resultfields)
         );
         if (!$search) {
             if (ldap_get_option($this->ldap, LDAP_OPT_DIAGNOSTIC_MESSAGE, $error)) {
@@ -203,9 +201,9 @@ class ldap
             }
         }
 
-        $this->count = ldap_count_entries($this->getConnection(), $search);
+        $this->count = ldap_count_entries($this->get_connection(), $search);
         if ($this->count > 0) {
-            $this->result = ldap_get_entries($this->getConnection(), $search);
+            $this->result = ldap_get_entries($this->get_connection(), $search);
         } else {
             $this->result = [];
         }
@@ -220,7 +218,7 @@ class ldap
      *
      * @return array
      */
-    public function getParsedResult(): array {
+    public function get_parsed_result(): array {
         $data = [];
         if (!empty($this->result)) {
             for ($i = 0; $i < $this->result['count']; $i++) {
@@ -242,7 +240,7 @@ class ldap
      * Get the raw result of the last successful query as it is received from ldap_get_entries().
      * @return array
      */
-    public function getRawResult(): array {
+    public function get_raw_result(): array {
         return $this->result;
     }
 
@@ -250,7 +248,7 @@ class ldap
      * Get number of results from last query.
      * @return int
      */
-    public function getCount(): int {
+    public function get_count(): int {
         return $this->count;
     }
 
@@ -259,11 +257,11 @@ class ldap
      * @param $searchfields
      * @return string
      */
-    protected function getFilter($searchfields): string {
+    protected function get_filter($searchfields): string {
         $filter = '';
         if (is_string($searchfields)) {
             $filter = $searchfields;
-        } elseif (is_array($searchfields)) {
+        } else if (is_array($searchfields)) {
             foreach ($searchfields as $key => $value) {
                 if (is_array($value)) {
                     $filter .= '(|';
@@ -272,7 +270,7 @@ class ldap
                     }
                     $filter .= ')';
                 } else {
-                    // Add first and if necessary
+                    // Add first and if necessary.
                     if (count($searchfields) > 1 && empty($filter)) {
                         $filter = '(&';
                     }
@@ -291,17 +289,19 @@ class ldap
      * @param $resultfields
      * @return array
      */
-    protected function getResultFields($resultfields = null): array {
+    protected function get_result_fields($resultfields = null): array {
         $justthese = [];
         if (is_string($resultfields)) {
             $resultfields = trim($resultfields);
             if (!empty($resultfields)) {
                 $justthese[] = trim($resultfields);
             }
-        } elseif (is_array($resultfields)) {
+        } else if (is_array($resultfields)) {
             $justthese = array_filter(
                 array_map(
-                    function ($i) { return trim($i); },
+                    function ($i) {
+                        return trim($i);
+                    },
                     array_values($resultfields)
                 ),
             );
