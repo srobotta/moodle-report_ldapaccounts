@@ -240,11 +240,11 @@ class user_query {
                         if (strtolower($val[1]) === 'like') {
                             $this->where .= $DB->sql_like($col, ' :' . $col, false, false);
                         } else {
-                            $this->where .= $val[1] . ' :' . $col . ' ';
+                            $this->where .= $col . $val[1] . ' :' . $col . ' ';
                         }
                         $this->args[$col] = $val[0];
                     } else {
-                        $this->where .= '= :' . $col . ' ';
+                        $this->where .= $col . '= :' . $col . ' ';
                         $this->args[$col] = $val;
                     }
                 }
