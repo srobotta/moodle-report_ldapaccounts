@@ -229,14 +229,19 @@ class user_query {
      * @return string
      */
     protected function get_where(): string {
+        global $DB;
         if ($this->where === null) {
             $this->where = '1=1';
             $this->args = [];
             if (!empty($this->filter)) {
                 foreach ($this->filter as $col => $val) {
-                    $this->where .= ' AND ' . $col . ' ';
+                    $this->where .= ' AND ';
                     if (is_array($val)) {
-                        $this->where .= $val[1] . ' :' . $col . ' ';
+                        if (strtolower($val[1]) === 'like') {
+                            $this->where .= $DB->sql_like($col, ' :' . $col, false, false);
+                        } else {
+                            $this->where .= $val[1] . ' :' . $col . ' ';
+                        }
                         $this->args[$col] = $val[0];
                     } else {
                         $this->where .= '= :' . $col . ' ';
