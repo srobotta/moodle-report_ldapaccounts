@@ -241,6 +241,75 @@ class report_form extends \moodleform {
     }
 
     /**
+     * From the submitted form data, create a parameter to reuse the same form data again.
+     * @return string
+     * @throws \dml_exception
+     */
+    public function get_permalink_param(): string
+    {
+        $data = [];
+        foreach (get_object_vars($this->get_submitted_data()) as $property => $value) {
+            $value = trim($value);
+            if (empty($value)) {
+                continue;
+            }
+            $key = str_replace('filter_', '', $property);
+            if (\in_array($key,  ['auth', 'deleted', 'suspended', 'emailstop', 'ldapstatus'])) {
+                $value = (int)$value;
+                if ($value === -1) {
+                    continue;
+                }
+                // Authmethods may change over the time, therefore store the real value instead of the selected option.
+                $data[$key] = $key === 'auth' ? $this->get_auth_methods()[$value] : $value;
+            } else if ($key === 'show_cols') {
+                $data[$key] = implode(',', $this->get_submitted_select_fields());
+            } else {
+                $data[$key] = $value;
+            }
+        }
+        if (!isset($data['download_csv'])) {
+            unset($data['csv_delimiter']);
+        }
+        unset($data['submitbutton']);
+        return base64_encode(json_encode($data));
+    }
+
+    /**
+     * Set form data from a permalink that was created with get_permalink_param().
+     *
+     * @param string $permalink
+     * @return report_form
+     * @throws \dml_exception
+     */
+    public function set_data_from_permalink(string $permalink): report_form {
+        $raw = base64_decode($permalink);
+        $data = json_decode(base64_decode($permalink), true);
+        if (!\is_array($data)) {
+            return $this;
+        }
+        foreach ($data as $key => $value) {
+            if ($key === 'auth') {
+                $authmethods = array_flip($this->get_auth_methods());
+                $idx = $authmethods[$value] ?? -1;
+                if ($idx > -1) {
+                    $this->_form->getElement('filter_auth')->setValue($idx);
+                }
+            }
+            else if (\in_array($key,  ['deleted', 'suspended', 'emailstop', 'firstname', 'lastname', 'email'])) {
+                $this->_form->getElement('filter_' . $key)->setValue($value);
+            } else if ($key === 'show_cols') {
+                $this->_form->getElement('show_cols')->setValue(str_replace(',', PHP_EOL, $value));
+            } else {
+                if ($this->_form->elementExists($key)) {
+                    $this->_form->getElement($key)->setValue($value);
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Is CSV checkbox set?
      * @return bool
      */
     public function is_csv_download(): bool {
@@ -248,6 +317,7 @@ class report_form extends \moodleform {
     }
 
     /**
+     * Get the character from the selected value of the csv_delimiter field.
      * @return string
      */
     public function get_csv_delimiter(): string {

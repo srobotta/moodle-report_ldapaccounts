@@ -62,6 +62,7 @@ $string['ldapserver_desc'] = 'Servername oder IP über welche der Dienst erreich
 $string['ldapserver'] = 'LDAP server';
 $string['ldapuser_desc'] = 'Der Name des Benutzers welcher sich mit dem Server verbinden soll.';
 $string['ldapuser'] = 'LDAP Benutzer';
+$string['permalink'] = 'Direktlink für diesen Bericht';
 $string['pluginname'] = 'Moodle Benutzerkonten in LDAP';
 $string['privacy:metadata'] = 'LDAP Benutzerkonten Bericht speichert keine personenbezogenen Daten.';
 $string['reportldapaccountsdesc'] = 'Der Bericht Moodle Benutzerkonten in LDAP zeigt auf, welche Benutzer in Moodle, und/oder nicht in LDAP vorkommen.';

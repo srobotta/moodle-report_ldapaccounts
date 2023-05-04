@@ -63,6 +63,7 @@ $string['ldapserver_desc'] = 'Server domain or IP where to connect to.';
 $string['ldapserver'] = 'LDAP server';
 $string['ldapuser_desc'] = 'Name of the user that is used for the connection.';
 $string['ldapuser'] = 'LDAP username';
+$string['permalink'] = 'Permalink for this report';
 $string['pluginname'] = 'Moodle Accounts in LDAP';
 $string['privacy:metadata'] = 'Moodle Accounts in LDAP does not store any personal data';
 $string['reportldapaccountsdesc'] = 'Select accounts in Moodle and check whether these exist in LDAP.';

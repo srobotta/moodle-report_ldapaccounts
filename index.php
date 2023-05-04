@@ -112,8 +112,13 @@ if (($mform->is_submitted() && $mform->is_validated())) {
         echo \html_writer::link(new moodle_url(
           '/report/ldapaccounts/',
             ['csv' => str_replace('.csv', '', $table->get_csvfile())]
-        ), 'Download');
+        ), get_string('form_download_csv', 'report_ldapaccounts'));
+        echo '&nbsp;|&nbsp;';
     }
+    echo \html_writer::link(new moodle_url(
+        '/report/ldapaccounts/',
+        ['permalink' => $mform->get_permalink_param()]
+    ), get_string('permalink', 'report_ldapaccounts'));
     $mform->display();
 } else if (isset($_REQUEST['csv'])) {
     $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $_REQUEST['csv'] . '.csv';
@@ -131,8 +136,8 @@ if (($mform->is_submitted() && $mform->is_validated())) {
     header("Content-Description: File Transfer");
     header('Content-Type: application/octet-stream');
     header('Content-Transfer-Encoding: binary');
-    header('Content-Disposition: attachment; filename=ldapaccounts-"'. date('Y-n-m-H-i') . '.csv"');
-    header('Content-Length: '.filesize($csvfile));
+    header('Content-Disposition: attachment; filename=ldapaccounts-"' . date('Y-n-m-H-i') . '.csv"');
+    header('Content-Length: ' . filesize($csvfile));
     readfile($csvfile);
     // Exit is needed here otherwise another Content-Type header might be sent which will break the download.
     exit();
@@ -144,6 +149,9 @@ if (($mform->is_submitted() && $mform->is_validated())) {
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('pluginname', 'report_ldapaccounts'));
     echo $OUTPUT->box(get_string('reportldapaccountsdesc', 'report_ldapaccounts') . "<br />&#160;", 'generalbox');
+    if (isset($_REQUEST['permalink'])) {
+        $mform->set_data_from_permalink($_REQUEST['permalink']);
+    }
     $mform->display();
 }
 
