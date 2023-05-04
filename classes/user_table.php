@@ -58,6 +58,11 @@ class user_table {
     private $table;
 
     /**
+     * @var string
+     */
+    private $csvfile;
+
+    /**
      * Constructor
      */
     public function __construct() {
@@ -129,6 +134,15 @@ class user_table {
     }
 
     /**
+     * Returns the name of the csv file in case one was written.
+     * @return string|null
+     */
+    public function get_csvfile(): ?string
+    {
+        return $this->csvfile;
+    }
+
+    /**
      * @param \stdClass $user
      * @return user_table
      * @throws \coding_exception
@@ -173,7 +187,7 @@ class user_table {
      * @throws \coding_exception
      */
     public function enable_header(bool $val): user_table {
-        $this->show_header = $val;
+        $this->showheader = $val;
         return $this;
     }
 
@@ -217,13 +231,81 @@ class user_table {
     }
 
     /**
+     * Return the directory where the csv files are stored.
+     * @return string
+     */
+    public static function get_dir(): string {
+        global $CFG;
+
+        // Directory where to store the csv files.
+        $dir = $CFG->dataroot . DIRECTORY_SEPARATOR . 'report_ldapaccounts';
+        if (!is_dir($dir) && !mkdir($dir, $CFG->directorypermissions)) {
+            throw new \RuntimeException('could not create directory for saving csv file');
+        }
+        return $dir;
+    }
+
+    /**
      * Write the table using the html_writer.
      * @return void
      */
     public function output_table(): void {
-        if ($this->show_header) {
+        if ($this->showheader) {
             $this->build_header_row();
         }
         echo \html_writer::table($this->table);
+    }
+
+    /**
+     * Write the table data into a csv file.
+     * @param string $delimiter
+     * @param string $quote
+     * @param string $escape
+     * @param string $eol
+     * @return void
+     */
+    public function output_csv(string $delimiter = ',', string $quote = '"', string $escape = '\\', string $eol = PHP_EOL) {
+        $this->csvfile = md5(microtime()) . '.csv';
+        $fp = fopen(self::get_dir() . DIRECTORY_SEPARATOR . $this->csvfile, 'w');
+        if (!$fp) {
+            throw new \RuntimeException('could not open csv file for writing');
+        }
+        foreach ($this->table->data as $row) {
+            fputcsv($fp, $this->prepare_csv_row($row), $delimiter, $quote, $escape, $eol);
+        }
+        fclose($fp);
+    }
+
+    /**
+     * If a row is inside the \html_table_row object, extract the cells, otherwise the row is just the array from
+     * the argument. All html must be converted to something usable in the CSV file.
+     * - In anchor tags, the href attribute is used.
+     * - In time tags, the content of the element is used.
+     * The so transformed array is returned.
+     *
+     * @param array|\html_table_row $row
+     * @return array
+     */
+    private function prepare_csv_row($row): array {
+        if ($row instanceof \html_table_row) {
+            $raw = [];
+            foreach ($row->cells as $cell) {
+                $raw[] = $cell->text;
+            }
+        } else {
+            $raw = $row;
+        }
+        foreach (\array_keys($raw) as $i) {
+            if (strpos($raw[$i], '<time') === 0) {
+                $raw[$i] = strip_tags($raw[$i]);
+            } else if (strpos($raw[$i], '<a ') === 0) {
+                $start = strpos($raw[$i], 'href="');
+                $end = $start !== false ? strpos($raw[$i], '"', $start + 7) : false;
+                if ($end !== false) {
+                    $raw[$i] = substr($raw[$i], $start + 6, $end - $start - 6);
+                }
+            }
+        }
+        return $raw;
     }
 }

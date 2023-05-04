@@ -42,7 +42,7 @@ $output = $PAGE->get_renderer('report_ldapaccounts');
 
 $mform = new \report_ldapaccounts\report_form(new moodle_url('/report/ldapaccounts/'));
 
-if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['download']))) {
+if (($mform->is_submitted() && $mform->is_validated())) {
     // Processing of the submitted form.
     $PAGE->set_pagelayout('admin');
     $PAGE->set_heading($SITE->fullname);
@@ -57,8 +57,8 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
     $filterldapstatus = $mform->get_filter_ldapstatus();
     $userquery = $mform->get_user_query();
     $userquery->set_selected_fields(array_unique(array_merge(
-        $userquery->get_selected_fields(),
-        ['deleted', 'suspended', 'emailstop'])
+            $userquery->get_selected_fields(),
+            ['deleted', 'suspended', 'emailstop'])
     ));
     $colstoshow = $mform->get_submitted_select_fields();
     array_splice($colstoshow, array_search('id', $colstoshow) + 1, 0, ['ldap_status']);
@@ -107,7 +107,35 @@ if (($mform->is_submitted() && $mform->is_validated()) || (isset($_POST['downloa
     }
 
     $table->output_table();
+    if ($mform->is_csv_download()) {
+        $table->output_csv($mform->get_csv_delimiter());
+        echo \html_writer::link(new moodle_url(
+          '/report/ldapaccounts/',
+            ['csv' => str_replace('.csv', '', $table->get_csvfile())]
+        ), 'Download');
+    }
     $mform->display();
+} else if (isset($_REQUEST['csv'])) {
+    $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $_REQUEST['csv'] . '.csv';
+    if (!file_exists($csvfile)) {
+        header('HTTP/1.0 404 not found');
+        exit();
+    }
+    // Switch off output buffering to write the content of a potentially large file.
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    header("Pragma: public");
+    header("Expires: 0");
+    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+    header("Content-Description: File Transfer");
+    header('Content-Type: application/octet-stream');
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Disposition: attachment; filename=ldapaccounts-"'. date('Y-n-m-H-i') . '.csv"');
+    header('Content-Length: '.filesize($csvfile));
+    readfile($csvfile);
+    // Exit is needed here otherwise another Content-Type header might be sent which will break the download.
+    exit();
 } else {
     // Form was not submitted yet.
     $PAGE->set_pagelayout('admin');

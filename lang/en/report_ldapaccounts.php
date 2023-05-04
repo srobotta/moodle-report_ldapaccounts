@@ -24,6 +24,8 @@
 
 $string['callreport'] = 'Call report';
 $string['form_col_ldap_status'] = 'LDAP status';
+$string['form_csv_delimiter'] = 'CSV Delimiter';
+$string['form_download_csv'] = 'Download report as CSV';
 $string['form_error_column'] = 'The field {0} does not exist in the user table.';
 $string['form_error_input'] = 'This field is invalid.';
 $string['form_filter_auth'] = 'Authentication';

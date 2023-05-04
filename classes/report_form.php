@@ -37,6 +37,12 @@ class report_form extends \moodleform {
     private $authmethods;
 
     /**
+     * CSV delimiter chars.
+     * @var string[]
+     */
+    private static $csvdelimiters = [',', ';', ':', '|', 'TAB'];
+
+    /**
      * Define the form.
      */
     protected function definition() {
@@ -64,9 +70,12 @@ class report_form extends \moodleform {
         $this->_form->setType('filter_email', PARAM_RAW_TRIMMED);
         $this->add_any_no_yes('filter_ldapstatus');
 
-        $this->_form->addElement('html', '<div class=""><h4>' . $this->s('form_show_userdata'). '</h4>');
+        $this->_form->addElement('html', '<h4>' . $this->s('form_show_userdata'). '</h4>');
         $this->_form->addElement('textarea', 'show_cols', $this->s('form_show_cols'), ['rows' => 6])
             ->setValue("id\nemail\nusername\nfirstname\nlastname\nlastlogin");
+
+        $this->_form->addElement('checkbox', 'download_csv', $this->s('form_download_csv'));
+        $this->_form->addElement('select', 'csv_delimiter',  $this->s('form_csv_delimiter'), self::$csvdelimiters);
 
         $this->_form->addElement('submit', 'submitbutton', $this->s('callreport'));
     }
@@ -229,5 +238,22 @@ class report_form extends \moodleform {
         }
         $query->set_filter_json($this->get_submitted_filters());
         return $query;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_csv_download(): bool {
+        return ($this->is_submitted() && isset($this->get_submitted_data()->download_csv));
+    }
+
+    /**
+     * @return string
+     */
+    public function get_csv_delimiter(): string {
+        $idx = $this->is_submitted() && isset($this->get_submitted_data()->csv_delimiter) ?
+            (int)$this->get_submitted_data()->csv_delimiter : -1;
+        $char = self::$csvdelimiters[$idx] ?: '';
+        return $char === 'TAB' ? "\t" : $char;
     }
 }
