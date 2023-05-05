@@ -34,7 +34,8 @@ $longparams = [
     'filter' => '',
     'help' => false,
     'ldapmail' => '',
-    'quiet' => false,
+    'ldapquery' => '',
+    'silent' => false,
 ];
 
 $shortparams = [
@@ -42,8 +43,9 @@ $shortparams = [
     'd' => 'delimiter',
     'f' => 'filter',
     'h' => 'help',
-    'l' => 'ldapmail',
-    'q' => 'quiet',
+    'm' => 'ldapmail',
+    'q' => 'ldapquery',
+    's' => 'silent',
 ];
 
 // Define exit codes.
@@ -57,7 +59,7 @@ $exiterrorldap = 5;
 // Now get cli options that are set by the caller.
 list($options, $unrecognized) = cli_get_params($longparams, $shortparams);
 
-$verbose = empty($options['quiet']);
+$verbose = empty($options['silent']);
 
 if ($unrecognized) {
     $unrecognized = implode("\n  ", $unrecognized);
@@ -68,30 +70,40 @@ if ($unrecognized) {
 }
 
 if ($options['help']) {
-    $help =
-        "Get users and check whether these exist in the ldap directory. A user is identified by his email.
+    $help = "
+Get users and check whether these exist in the ldap directory. A user is
+identified by his email.
 
-There are no security checks here because anybody who is able to
-execute this file may execute any PHP too.
+There are no security checks here because anybody who is able to execute
+this file may execute any PHP too.
 
 Options:
--a, --action    Action on the user, possible actions are suspend, delete, emailstop.
-                The user entry will be modified in that way, when there is no entry found in the LDAP
-                with this users email address. In case an action is used, the users are written to stdout
-                only if the action has been applied to the user and the data has been modified.
--d, --delimiter CSV delimiter, can be one of ; , | ~ : tab
-                If not set, the semicolon is used.
--f, --filter    Filter which users to select. Think of an array such as:
-                only active users: ['deleted' => 0]
-                only users with email ending in @example.org: ['email' => '*example.org']
-                only users with id > than 100: ['id' => '>100']
-                You may also combine these: ['deleted' => 0, 'email' => '*example.org']
-                Take this string and convert it into a json. The correct filter argument for the above should
-                look like this: {\"deleted\":0,\"email\":\"*example.org\"}
-                Fields that can be used are all columns inside the user table.
--h, --help      Print out this help
--l, --ldapmail  The ldap mail field where to look up emails. If not set 'mail' is used.
--q, --quiet     No output to stdout
+-a, --action     Action on the user, possible actions are suspend, delete,
+                 emailstop. The user entry will be modified in that way,
+                 when there is no entry found in the LDAP with this users
+                 email address. In case an action is used, the users are
+                 written to stdout only if the action has been applied to
+                 the user and the data has been modified.
+-d, --delimiter  CSV delimiter, can be one of ; , | ~ : tab
+                 If not set, the semicolon is used.
+-f, --filter     Filter which users to select. Think of an array such as:
+                 only active users: ['deleted' => 0]
+                 only users with email ending in example.org:
+                 ['email' => '*example.org']
+                 only users with id > than 100: ['id' => '>100']
+                 You may also combine these:
+                 ['deleted' => 0, 'email' => '*example.org']
+                 Take this string and convert it into a json. The correct
+                 filter argument for the above should
+                 look like this: {\"deleted\":0,\"email\":\"*example.org\"}
+                 Fields that can be used are all columns inside the user
+                 table.
+-h, --help       Print out this help
+-m, --ldapmail   The ldap mail field where to look up emails. If not set
+                 the setting `report_ldapaccounts | ldapmailfield` is used.
+-q, --ldapquery  Query prefix that is prepend to all LDAP queries. If not
+                 set the setting `report_ldapaccounts | ldapquery` is used.
+-s, --silent     No output to stdout.
 
 Example:
 \$sudo -u www-data /usr/bin/php report/ldapaccounts/cli/ldapaccounts.php -f='{\"deleted\":0,\"email\":\"*example.org\"}'
@@ -131,7 +143,8 @@ if (!empty($action)) {
 }
 
 
-$ldapmailfield = $options['ldapmail'] ?: \report_ldapaccounts\config::get_instance()->get_setting('ldapmailfield');
+$ldapmail = $options['ldapmail'] ?: \report_ldapaccounts\config::get_instance()->get_setting('ldapmailfield');
+$ldapquery = $options['ldapprefix'] ?: \report_ldapaccounts\config::get_instance()->get_setting('ldapquery');
 
 
 // Prepare query for users in Moodle db.
@@ -166,7 +179,8 @@ while (1) {
         $userinldap[$user->email] = 0;
     }
     try {
-        $ldapres = $ldap->search([$ldapmailfield => array_keys($userinldap)], $ldapmailfield)->get_parsed_result();
+        $ldapres = $ldap->search([$ldapmail => array_keys($userinldap)], $ldapmail, $ldapquery)
+            ->get_parsed_result();
     } catch (\RuntimeException $e) {
         if ($verbose) {
             cli_error($e->getMessage(), $exiterrorldap);
@@ -174,7 +188,7 @@ while (1) {
         exit($exiterrorldap);
     }
     foreach ($ldapres as $ldapuser) {
-        $userinldap[$ldapuser[$ldapmailfield]] = 1;
+        $userinldap[$ldapuser[$ldapmail]] = 1;
     }
     if (!$csvheader && $verbose) {
         $fields = ['id', 'ldap', 'email', 'firstname', 'lastname'];
