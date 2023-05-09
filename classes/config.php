@@ -37,22 +37,23 @@ class config {
     private static $instance;
 
     /**
-     * The defined settings keys and the default value.
+     * The defined settings keys and default value, type of setting.
      * Internally the setting names are all without the ldap prefix, except the
-     * ldapmailfield setting.
+     * ldapmailfield, and ldapquery setting.
      *
      * @var array
      */
     private $settingsanddefaults = [
-        'ldapserver' => '',
-        'ldapuser' => '',
-        'ldappass' => '',
-        'ldapbasedn' => '',
-        'ldapport' => 636,
-        'ldapcert' => '',
-        'ldapcacert' => '',
-        'ldapmailfield' => 'mail',
-        'ldapquery' => '',
+        'ldapserver' => ['', PARAM_RAW_TRIMMED],
+        'ldapuser' => ['', PARAM_RAW_TRIMMED],
+        'ldappass' => ['', PARAM_RAW_TRIMMED],
+        'ldapbasedn' => ['', PARAM_RAW_TRIMMED],
+        'ldapport' => [636, PARAM_INT],
+        'ldapcert' => ['', PARAM_RAW_TRIMMED],
+        'ldapcacert' => ['', PARAM_RAW_TRIMMED],
+        'ldapmailfield' => ['mail', PARAM_RAW_TRIMMED],
+        'ldapquery' => ['', PARAM_RAW_TRIMMED],
+        'logging' => [false, PARAM_BOOL],
     ];
 
     /**
@@ -81,14 +82,17 @@ class config {
         if ($this->values === null) {
             $this->values = [];
             $stored = get_config('report_ldapaccounts');
-            foreach ($this->settingsanddefaults as $key => $default) {
+            foreach ($this->settingsanddefaults as $key => $tuple) {
+                [$default, $paramtype] = $tuple;
                 $shortkey = ($key !== 'ldapmailfield' && $key !== 'ldapquery')
                     ? str_replace('ldap', '', $key) : $key;
                 $this->values[$shortkey] = (isset($stored->{$key}) && !empty($stored->{$key}))
                     ? $stored->{$key}
                     : $default;
-                if ($key === 'ldapport') { // Port needs to be an int to be typesafe later.
+                if ($paramtype === PARAM_INT) { // Cast values according to their type.
                     $this->values[$shortkey] = (int)$this->values[$shortkey];
+                } else if ($paramtype === PARAM_BOOL) {
+                    $this->values[$shortkey] = (bool)$this->values[$shortkey];
                 }
             }
         }
@@ -131,13 +135,14 @@ class config {
      * @throws \coding_exception
      */
     public function add_config_to_settings_page(\admin_settingpage $settings): void {
-        foreach ($this->settingsanddefaults as $key => $defaultval) {
-            $settings->add(new \admin_setting_configtext(
+        foreach ($this->settingsanddefaults as $key => $tuple) {
+            $configclass = $tuple[1] === PARAM_BOOL ? '\admin_setting_configcheckbox' : '\admin_setting_configtext';
+            $settings->add(new $configclass(
                 'report_ldapaccounts/' . $key,
                 get_string($key, 'report_ldapaccounts'),
                 get_string($key . '_desc', 'report_ldapaccounts'),
-                $defaultval,
-                ($key === 'ldapport') ? PARAM_INT : PARAM_RAW_TRIMMED
+                $tuple[0],
+                $tuple[1]
             ));
         }
     }

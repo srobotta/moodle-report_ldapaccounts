@@ -90,6 +90,12 @@ class ldap {
     private $count;
 
     /**
+     * Whether logs are enabled or not.
+     * @var bool
+     */
+    private $logging;
+
+    /**
      * @param string $server
      * @param string $basedn
      * @param string $username
@@ -125,7 +131,30 @@ class ldap {
         if (!empty($cfg->cacert)) {
             $ldap->set_cacertfile($cfg->cacert);
         }
+        if ($cfg->logging) {
+            $ldap->enable_logging();
+        } else {
+            $ldap->disable_logging();
+        }
         return $ldap;
+    }
+
+    /**
+     * Enable logging of all LDAP communication.
+     * @return ldap
+     */
+    public function enable_logging(): ldap {
+        $this->logging = true;
+        return $this;
+    }
+
+    /**
+     * Disable logging of all LDAP communication.
+     * @return ldap
+     */
+    public function disable_logging(): ldap {
+        $this->logging = false;
+        return $this;
     }
 
     /**
@@ -181,22 +210,44 @@ class ldap {
     }
 
     /**
+     * @param string $filter
+     * @param array $justthese
+     * @param array|string $result
+     * @return void
+     * @throws \coding_exception
+     */
+    protected function log(string $filter, array $justthese, $result)
+    {
+        if (!$this->logging) {
+            return;
+        }
+        $data = [
+            'other' => [
+                'filter' => $filter,
+                'justthese' => implode(',', $justthese),
+                'result' => !is_string($result) ? json_encode($result) : $result,
+            ]
+        ];
+        $logger = event\log_debug::create($data);
+        $logger->trigger();
+    }
+
+    /**
      * @param array|string $searchfields
      * @param array|string|null $resultfields
      * @param string|null $fixedquerypart
      * @return ldap
      */
     public function search($searchfields, $resultfields = null, string $fixedquerypart = null): ldap {
-        $search = ldap_search(
-            $this->get_connection(),
-            $this->basedn,
-            $fixedquerypart . $this->get_filter($searchfields),
-            $this->get_result_fields($resultfields)
-        );
+        $filter = $fixedquerypart . $this->get_filter($searchfields);
+        $justthese = $this->get_result_fields($resultfields);
+        $search = ldap_search($this->get_connection(), $this->basedn, $filter, $justthese);
         if (!$search) {
             if (ldap_get_option($this->ldap, LDAP_OPT_DIAGNOSTIC_MESSAGE, $error)) {
+                $this->log($filter, $justthese, 'Error searching LDAP: ' . $error);
                 throw new \RuntimeException("Error searching in LDAP: $error");
             } else {
+                $this->log($filter, $justthese, 'Error searching LDAP: No additional information is available.');
                 throw new \RuntimeException('Error searching in LDAP: No additional information is available.');
             }
         }
@@ -207,6 +258,7 @@ class ldap {
         } else {
             $this->result = [];
         }
+        $this->log($filter, $justthese, $this->get_raw_result());
         ldap_free_result($search);
         return $this;
     }
