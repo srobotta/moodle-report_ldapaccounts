@@ -1,30 +1,30 @@
 # Report LDAP User Accounts
 
-This plugin can match user accounts in Moodle with an LDAP directory in the organisation.
-There is a new reports page that takes users from Moodle, checks whether these
-exist in the LDAP directory and displays them in a table. Various filters can be used
+This plugin displays a report page and matches user accounts in Moodle with an LDAP
+directory in the organisation. Various filters can be used
 to select users. The report may also be exported.
 
 Another functionality of the plugin is that it provides a cli script. This has the same
-functionality like the reports page, but can also be used to automatically suspend, delete
-or set the emailstop flag for users. The idea is that the process can be automated to
-update the users in Moodle e.g. at the start of a new semester.
+functionality like the report page, but can also be used to automatically suspend,
+delete accounts or set the emailstop flag for the user.
 
 ## Motivation
  
 The use case for the need of this plugin was that the Moodle authentication is
-done via [Sibboleth](https://en.wikipedia.org/wiki/Shibboleth_(software)) (an SSO service
-that is not part of the institution). If the user is authenticated via the SSO provider
+done via [Sibboleth](https://en.wikipedia.org/wiki/Shibboleth_(software))
+(an SSO service). If the user is authenticated via the SSO provider
 and the identity service of the institution, the user is redirected to Moodle together
-with some information who he is. He then is logged in or even created. LDAP may work here
-as the identity provider for Shibboleth but there is no direct connection from/to Moodle.
+with some information who he is. He then is logged in or even created. A LDAP directory
+may work here as the identity provider for Shibboleth but there is no direct
+connection from/to Moodle.
 
 Whenever a user drops out of the institution the identity provider will not allow to
 log him in anymore. However, the account in Moodle is still active and emails may be
 send out to the users email address.
 
 Therefore, there is a need to detect such users and disable or delete them from Moodle
-once they do not yet exist in the LDAP anymore.
+once they do not yet exist in the LDAP anymore. The CLI script should automate the
+process e.g. at each start of a new semeter or term.
 
 ## Installation
 
@@ -61,6 +61,10 @@ The setting "LDAP Query" may contain some additional LDAP query parameters to se
 an user. Imagine the use case that the LDAP directory contains person and institution
 items, both having an email field. In this setting the query might contain additional
 conditions e.g. `(objectClass=person)` to select the person items only.
+
+The setting "Enable logging" is to log all the communication between Moodle and the
+LDAP service. This is indented for debug reasons and should not be enabled unless
+necessary (see also notes on Privacy below).
 
 ## Privacy
 
@@ -198,7 +202,6 @@ Possible future changes could be:
 
 - More flexibility in matching users in Moodle and LDAP (the username field could be
   used for that, too).
-- Logging of requests and results in the communication with the LDAP server.
 - Use output options of Moodle and not the hard coded csv export.
 - Fetch and display other values from the LDAP server, not only the email field to
   match the users.
