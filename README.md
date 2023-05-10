@@ -62,6 +62,23 @@ an user. Imagine the use case that the LDAP directory contains person and instit
 items, both having an email field. In this setting the query might contain additional
 conditions e.g. `(objectClass=person)` to select the person items only.
 
+## Privacy
+
+In general the LDAP report just fetches data from the LDAP server and lists data
+in the report that are already in the Moodle database. However, there are two
+exceptions.
+
+- If the user selects to download the report as a CSV file, the data gets stored in
+  a file that is located in the Moodle data directory. The file remains there until
+  it's removed from an external job or manually by the Admin (see below).
+- For debug reasons logging can be enabled. This logs the entire communication between
+  Moodle and the LDAP server. The logs are stored in the database of Moodle and in
+  case of the LDAP response may contain personal information from the LDAP entries that
+  are not yet in Moodle and also will not be processed any further. By default, the
+  reports page fetches the email field only. The response contains the `mail` field
+  and the `dn` field only. On the command line the query may look more complex and
+  may contain additional data that would be in this case in the log as well.
+
 ## Report page
 
 The report page can be called using the path `/report/ldapaccounts/`. You also get to
@@ -77,13 +94,14 @@ by authentication method. The selections "Deleted", "Suspended", "Emailstop", an
 By default, any of the options can be set i.e. the filter is not applied to the search.
 The Filters firstname and lastname can be used to select users starting with these
 letters. No wildcard has to be used.
+
 The email field may use a wildcard. Here you can use a concrete email or e.g. select
 all emails from a certain domain only. Wildcard character is the asterisk.
 
 While all filters work directly with the data from the user table in Moodle the
 "LDAP status" field is used on the results after the user items have been queried at
 the LDAP directory. If the filter is set, only the users are displayed that match the
-criteria.
+criteria (i.e. exist in the LDAP or not).
 
 ### Display user data
 
