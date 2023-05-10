@@ -63,7 +63,7 @@ items, both having an email field. In this setting the query might contain addit
 conditions e.g. `(objectClass=person)` to select the person items only.
 
 The setting "Enable logging" is to log all the communication between Moodle and the
-LDAP service. This is indented for debug reasons and should not be enabled unless
+LDAP service. This is intended for debug reasons and should not be enabled unless
 necessary (see also notes on Privacy below).
 
 ## Privacy
