@@ -314,6 +314,9 @@ class ldap {
         if (is_string($searchfields)) {
             $filter = $searchfields;
         } else if (is_array($searchfields)) {
+            if (count($searchfields) > 1) {
+                $filter = '(&';
+            }
             foreach ($searchfields as $key => $value) {
                 if (is_array($value)) {
                     $filter .= '(|';
@@ -322,11 +325,7 @@ class ldap {
                     }
                     $filter .= ')';
                 } else {
-                    // Add first and if necessary.
-                    if (count($searchfields) > 1 && empty($filter)) {
-                        $filter = '(&';
-                    }
-                    $filter = '(' . $key . '=' . $value . ')';
+                    $filter .= '(' . $key . '=' . $value . ')';
                 }
             }
             if (count($searchfields) > 1) {
