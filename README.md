@@ -8,10 +8,10 @@ Another functionality of the plugin is that it provides a cli script. This has t
 functionality like the report page, but can also be used to automatically suspend,
 delete accounts or set the emailstop flag for the user.
 
-## Motivation
+## Use case
  
 The use case for the need of this plugin was that the Moodle authentication is
-done via [Sibboleth](https://en.wikipedia.org/wiki/Shibboleth_(software))
+done via [Shibboleth](https://en.wikipedia.org/wiki/Shibboleth_(software))
 (an SSO service). If the user is authenticated via the SSO provider
 and the identity service of the institution, the user is redirected to Moodle together
 with some information who he is. He then is logged in or even created. A LDAP directory
@@ -24,7 +24,7 @@ send out to the users email address.
 
 Therefore, there is a need to detect such users and disable or delete them from Moodle
 once they do not yet exist in the LDAP anymore. The CLI script should automate the
-process e.g. at each start of a new semeter or term.
+process e.g. at each start of a new term.
 
 ## Installation
 
