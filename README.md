@@ -28,11 +28,9 @@ process e.g. at each start of a new semeter or term.
 
 ## Installation
 
-Unpack the zip file and copy it's content into a subdirectory of
-your Moodle installation below the `report` directory.
-
-Go to the settings page
-"Site administration" -> "Plugins" -> "Report" -> "Settings for Moodle Accounts in LDAP Report"
+1. Unpack the zip file into your Moodle installation below the `report` directory.
+2. Inside the directory rename the folder `moodle-report_ldapaccounts` into `ldapaccounts`.
+3. Go to the settings page at "Site administration" -> "Plugins" -> "Report" -> "Settings for Moodle Accounts in LDAP Report"
 and add the connection data to your LDAP server.
 
 ## User identification between Moodle and LDAP
