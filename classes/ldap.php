@@ -196,7 +196,7 @@ class ldap {
                 throw new \RuntimeException('could not set protocol to v3');
             }
             ldap_set_option($this->ldap, LDAP_OPT_REFERRALS, false);
-            $bind = ldap_bind($this->ldap, $this->username, $this->password);
+            $bind = @ldap_bind($this->ldap, $this->username, $this->password);
 
             if (!$bind) {
                 if (ldap_get_option($this->ldap, LDAP_OPT_DIAGNOSTIC_MESSAGE, $error)) {

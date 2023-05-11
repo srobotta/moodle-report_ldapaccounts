@@ -35,20 +35,62 @@ require_once($CFG->dirroot . '/lib/statslib.php');
 require_once($CFG->dirroot . '/course/lib.php');
 
 require_login();
+
+// CSV Download was triggered.
+if (isset($_REQUEST['csv'])) {
+    $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $_REQUEST['csv'] . '.csv';
+    if (!file_exists($csvfile)) {
+        header('HTTP/1.0 404 not found');
+        exit();
+    }
+    // Switch off output buffering to write the content of a potentially large file.
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+    header("Pragma: public");
+    header("Expires: 0");
+    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+    header("Content-Description: File Transfer");
+    header('Content-Type: application/octet-stream');
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Disposition: attachment; filename=ldapaccounts-"' . date('Y-n-m-H-i') . '.csv"');
+    header('Content-Length: ' . filesize($csvfile));
+    readfile($csvfile);
+    // Exit is needed here otherwise another Content-Type header might be sent which will break the download.
+    exit();
+}
+
 $context = context_system::instance();
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/report/ldapaccounts/index.php'));
 $output = $PAGE->get_renderer('report_ldapaccounts');
+$PAGE->set_pagelayout('admin');
+$PAGE->set_heading($SITE->fullname);
+$PAGE->set_title($SITE->fullname . ': ' . get_string('pluginname', 'report_ldapaccounts'));
+echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('pluginname', 'report_ldapaccounts'));
+
+if (empty(\report_ldapaccounts\config::get_instance()->get_setting('server')) ||
+    empty(\report_ldapaccounts\config::get_instance()->get_setting('user'))
+) {
+    $text = get_string('ldapnotconfigured', 'report_ldapaccounts');
+    if (strpos($text, '[link]') !== false) {
+        $link = (new moodle_url('/admin/settings.php?section=report_ldapaccounts_settings'))->__toString();
+        $text = str_replace('[link]', '<a href="' . $link . '">', $text);
+        if (strpos($text, '[/link]') !== false) {
+            $text = str_replace('[/link]', '</a>', $text);
+        } else {
+            $text .= '</a>';
+        }
+    }
+    echo $output->box($text, 'alert alert-warning');
+    echo $OUTPUT->footer();
+    exit;
+}
 
 $mform = new \report_ldapaccounts\report_form(new moodle_url('/report/ldapaccounts/'));
-
 if (($mform->is_submitted() && $mform->is_validated())) {
     // Processing of the submitted form.
-    $PAGE->set_pagelayout('admin');
-    $PAGE->set_heading($SITE->fullname);
-    $PAGE->set_title($SITE->fullname . ': ' . get_string('pluginname', 'report_ldapaccounts'));
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('pluginname', 'report_ldapaccounts'));
     echo $OUTPUT->box(get_string('reportldapaccountsdesc', 'report_ldapaccounts') . "<br />&#160;", 'generalbox');
 
     $ldap = \report_ldapaccounts\ldap::init_from_config();
@@ -91,7 +133,7 @@ if (($mform->is_submitted() && $mform->is_validated())) {
             $ldapres = $ldap->search([$ldapmailfield => array_keys($userinldap)], $ldapmailfield, $ldapquerypart)
                 ->get_parsed_result();
         } catch (\RuntimeException $e) {
-            echo $OUTPUT->box($e->getMessage(), 'generalbox');
+            echo $OUTPUT->box($e->getMessage(), 'alert alert-danger');
             break;
         }
         foreach ($ldapres as $ldapuser) {
@@ -120,34 +162,8 @@ if (($mform->is_submitted() && $mform->is_validated())) {
         ['permalink' => $mform->get_permalink_param()]
     ), get_string('permalink', 'report_ldapaccounts'));
     $mform->display();
-} else if (isset($_REQUEST['csv'])) {
-    $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $_REQUEST['csv'] . '.csv';
-    if (!file_exists($csvfile)) {
-        header('HTTP/1.0 404 not found');
-        exit();
-    }
-    // Switch off output buffering to write the content of a potentially large file.
-    if (ob_get_level() > 0) {
-        ob_end_clean();
-    }
-    header("Pragma: public");
-    header("Expires: 0");
-    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-    header("Content-Description: File Transfer");
-    header('Content-Type: application/octet-stream');
-    header('Content-Transfer-Encoding: binary');
-    header('Content-Disposition: attachment; filename=ldapaccounts-"' . date('Y-n-m-H-i') . '.csv"');
-    header('Content-Length: ' . filesize($csvfile));
-    readfile($csvfile);
-    // Exit is needed here otherwise another Content-Type header might be sent which will break the download.
-    exit();
 } else {
     // Form was not submitted yet.
-    $PAGE->set_pagelayout('admin');
-    $PAGE->set_heading($SITE->fullname);
-    $PAGE->set_title($SITE->fullname . ': ' . get_string('pluginname', 'report_ldapaccounts'));
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('pluginname', 'report_ldapaccounts'));
     echo $OUTPUT->box(get_string('reportldapaccountsdesc', 'report_ldapaccounts') . "<br />&#160;", 'generalbox');
     if (isset($_REQUEST['permalink'])) {
         $mform->set_data_from_permalink($_REQUEST['permalink']);

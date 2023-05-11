@@ -39,8 +39,8 @@ $string['form_filter_userdata'] = 'Filter Benutzer';
 $string['form_show_cols'] = 'Spalten';
 $string['form_show_userdata'] = 'Anzeige der Benutzerdaten';
 $string['ldapaccounts:view'] = 'Moodle Benutzerkonten in LDAP ansehen';
-$string['ldapbasedn_desc'] = 'Der Wurzelknoten von dem aus alle LDAP Objekte hierarchisch gesucht werden.';
 $string['ldapbasedn'] = 'LDAP base DN';
+$string['ldapbasedn_desc'] = 'Der Wurzelknoten von dem aus alle LDAP Objekte hierarchisch gesucht werden.';
 $string['ldapcacert'] = 'CA cert file';
 $string['ldapcacert_desc'] = 'Zertifikatsdatei der CA. Falls die Verbindung zum Server nicht funktioniert kann man das Server Zertifikat hier angeben. Dazu muss es runtergeladen und lokal gespeichert werden:
    1. Zertifikat anzeigen lassen mittels: openssl s_client -connect example.com:636.
@@ -50,18 +50,19 @@ $string['ldapcacert_desc'] = 'Zertifikatsdatei der CA. Falls die Verbindung zum 
 ';
 $string['ldapcert'] = 'Cert file';
 $string['ldapcert_desc'] = 'Zertifikatsdatei des eigenen Moodle Servers, falls benötigt.';
-$string['ldapmailfield_desc'] = 'Der Name des Feldes in LDAP in welchem die Mailadresse der Person gespeichert wird.';
 $string['ldapmailfield'] = 'E-Mail Feld in LDAP';
-$string['ldappass_desc'] = 'Das Passwort des Benutzers.';
+$string['ldapmailfield_desc'] = 'Der Name des Feldes in LDAP in welchem die Mailadresse der Person gespeichert wird.';
+$string['ldapnotconfigured'] = 'Die LDAP Verbindung ist nicht konfiguriert. Bitte in den [link]Einstellungen[/link] ändern.';
 $string['ldappass'] = 'LDAP Passwort';
-$string['ldapport_desc'] = 'Der Serverport auf welchem der Dienst erreichbar ist.';
+$string['ldappass_desc'] = 'Das Passwort des Benutzers.';
 $string['ldapport'] = 'LDAP Server Port';
-$string['ldapquery_desc'] = 'Feste Abfrage an LDAP um Nutzer auszuwählen (z.B. `(&(objectClass=person)(objectClass=top))`). Diese Abfrage wird mit der email aus dem Benutzerdatensatz erweitert.';
+$string['ldapport_desc'] = 'Der Serverport auf welchem der Dienst erreichbar ist.';
 $string['ldapquery'] = 'LDAP Abfrage';
-$string['ldapserver_desc'] = 'Servername oder IP über welche der Dienst erreichbar ist.';
+$string['ldapquery_desc'] = 'Feste Abfrage an LDAP um Nutzer auszuwählen (z.B. `(&(objectClass=person)(objectClass=top))`). Diese Abfrage wird mit der email aus dem Benutzerdatensatz erweitert.';
 $string['ldapserver'] = 'LDAP server';
-$string['ldapuser_desc'] = 'Der Name des Benutzers welcher sich mit dem Server verbinden soll.';
+$string['ldapserver_desc'] = 'Servername oder IP über welche der Dienst erreichbar ist.';
 $string['ldapuser'] = 'LDAP Benutzer';
+$string['ldapuser_desc'] = 'Der Name des Benutzers welcher sich mit dem Server verbinden soll.';
 $string['log_debug'] = 'LDAP Debug';
 $string['logging'] = 'Aktiviere Logs für LDAP Kommunikation';
 $string['logging_desc'] = 'Alle Anfragen und Antworten zum LDAP Server werden im Log protokolliert.';
