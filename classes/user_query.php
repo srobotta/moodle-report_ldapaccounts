@@ -93,7 +93,7 @@ class user_query {
      * as %) and an operator e.g. > < >= <= like etc.
      *
      * @param array $filter
-     * @return self
+     * @return user_query
      */
     public function set_filter(array $filter): self {
         $this->validate_fields(\array_keys($filter));
@@ -109,7 +109,7 @@ class user_query {
      * Examples are: {"deleted":0,"email":"*@example.org"} -> active users that have an email in example.org
      *
      * @param string $json
-     * @return self
+     * @return user_query
      */
     public function set_filter_json(string $json): self {
         $data = json_decode($json, true);
@@ -135,13 +135,29 @@ class user_query {
     }
 
     /**
-     * The fields that should be selected from the user table.
+     * The fields that should be selected from the user table. Remove the field ldap_status that is not
+     * contained in the user table.
      * @param array $fields
-     * @return self
+     * @return user_query
      */
     public function set_selected_fields(array $fields): self {
         $this->validate_fields($fields);
         $this->selectedfields = $fields;
+        return $this;
+    }
+
+    /**
+     * Add fields that should be selected, without overwriting fields that are already in the selection.
+     * @param array $fields
+     * @return user_query
+     */
+    public function add_selected_fields(array $fields): self {
+        $this->validate_fields($fields);
+        foreach($fields as $field) {
+            if (!\in_array($field, $this->selectedfields)) {
+                $this->selectedfields[] = $field;
+            }
+        }
         return $this;
     }
 
@@ -158,12 +174,7 @@ class user_query {
      * @return void
      */
     public function validate_fields(array $fields): void {
-        global $DB;
-        static $cols;
-
-        if ($cols === null) {
-            $cols = $DB->get_columns('user');
-        }
+        $cols = \array_flip(self::get_possible_fields());
         foreach ($fields as $field) {
             if (!isset($cols[$field])) {
                 throw new \InvalidArgumentException('Field ' . $field . ' does not exist in user table');
@@ -172,8 +183,27 @@ class user_query {
     }
 
     /**
+     * Get column information for user table. Valid column are reduced by security related values.
+     * @return array
+     */
+    public static function get_possible_fields(): array {
+        global $DB;
+        static $cols;
+
+        if ($cols === null) {
+            // Get all column names from the DB.
+            $cols = \array_keys($DB->get_columns('user'));
+            // Flip array to easily kick out password and secret.
+            $cols = \array_flip($cols);
+            unset($cols['password'], $cols['secret']);
+            $cols = \array_flip($cols);
+        }
+        return $cols;
+    }
+
+    /**
      * @param int $size
-     * @return self
+     * @return user_query
      */
     public function set_page_size(int $size): self {
         if ($size < 1) {
@@ -185,7 +215,7 @@ class user_query {
 
     /**
      * @param int $page
-     * @return self
+     * @return user_query
      */
     public function set_page(int $page): self {
         if ($page < 0) {
@@ -205,7 +235,7 @@ class user_query {
 
     /**
      * Autoincrement page to get the next chunk when running getUsers() again.
-     * @return self
+     * @return user_query
      */
     public function set_next_page(): self {
         $this->page++;
@@ -263,7 +293,13 @@ class user_query {
         if ($this->recordcnt === null) {
             $this->recordcnt = $DB->count_records_select('user', $this->get_where(), $this->get_args());
         }
-        $cols = empty($this->selectedfields) ? '*' : implode(', ', $this->selectedfields);
+        if (empty($this->selectedfields)) {
+            $cols = ',';
+        } else if (!\in_array('id', $this->selectedfields)) {
+            $cols = 'id,' . implode(', ', $this->selectedfields);
+        } else {
+            $cols = implode(', ', $this->selectedfields);
+        }
         $sql = 'SELECT ' . $cols . ' FROM {user} WHERE ' . $this->get_where()
             . ' ORDER BY id';
         if ($this->size > 0) {

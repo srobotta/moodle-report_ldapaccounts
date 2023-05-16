@@ -71,8 +71,18 @@ class report_form extends \moodleform {
         $this->add_any_no_yes('filter_ldapstatus');
 
         $this->_form->addElement('html', '<h4>' . $this->s('form_show_userdata'). '</h4>');
-        $this->_form->addElement('textarea', 'show_cols', $this->s('form_show_cols'), ['rows' => 6])
-            ->setValue("id\nemail\nusername\nfirstname\nlastname\nlastlogin");
+
+        // Build here the multi select element for the cols to show.
+        $cols = user_query::get_possible_fields();
+        // Insert the ldap_status field after id.
+        array_splice($cols, array_search('id', $cols) + 1, 0, ['ldap_status']);
+        $cols = \array_flip($cols);
+        foreach (\array_keys($cols) as $col) {
+            $cols[$col] = $col;
+        }
+        $this->_form->addElement('select', 'show_cols', $this->s('form_show_cols'),
+            $cols, ['size' => 7, 'multiple' => true])
+            ->setValue('id,ldap_status,email,username,firstname,lastname,lastlogin');
 
         $this->_form->addElement('checkbox', 'download_csv', $this->s('form_download_csv'));
         $this->_form->addElement('select', 'csv_delimiter',  $this->s('form_csv_delimiter'), self::$csvdelimiters);
@@ -130,9 +140,12 @@ class report_form extends \moodleform {
                 try {
                     (new user_query())->validate_fields($this->get_submitted_select_fields());
                 } catch (\InvalidArgumentException $e) {
-                    $errors[$key] = str_replace('{0}', explode(' ', $e->getMessage())[1],
-                       get_string('form_error_column', 'report_ldapaccounts')
-                    );
+                    $errorfield = explode(' ', $e->getMessage())[1];
+                    if ($errorfield !== 'ldap_status') {
+                        $errors[$key] = str_replace('{0}', $errorfield,
+                            get_string('form_error_column', 'report_ldapaccounts')
+                        );
+                    }
                 }
             }
         }
@@ -215,25 +228,26 @@ class report_form extends \moodleform {
                 function ($i) {
                     return trim($i);
                 },
-                explode("\n", $this->get_submitted_data()->show_cols ?? '')
+                $this->get_submitted_data()->show_cols ?? []
             ),
             function ($i) {
                 return !empty($i);
             }
         );
-        if (!\in_array('id', $cols)) {
-            array_unshift($cols, 'id');
-        }
         return $cols;
     }
 
     /**
+     * Get the user_query instance from the selected show_cols and filters.
      * @return user_query
      */
     public function get_user_query(): user_query {
         $query = new user_query();
         $cols = $this->get_submitted_select_fields();
         if (!empty($cols)) {
+            if (\in_array('ldap_status', $cols)) {
+                $cols = array_diff($cols, ['ldap_status']);
+            }
             $query->set_selected_fields($cols);
         }
         $query->set_filter_json($this->get_submitted_filters());
@@ -249,7 +263,7 @@ class report_form extends \moodleform {
     {
         $data = [];
         foreach (get_object_vars($this->get_submitted_data()) as $property => $value) {
-            $value = trim($value);
+            $value = \is_array($value) ? implode($value) : trim($value);
             if (empty($value)) {
                 continue;
             }
@@ -282,7 +296,6 @@ class report_form extends \moodleform {
      * @throws \dml_exception
      */
     public function set_data_from_permalink(string $permalink): report_form {
-        $raw = base64_decode($permalink);
         $data = json_decode(base64_decode($permalink), true);
         if (!\is_array($data)) {
             return $this;
@@ -298,7 +311,7 @@ class report_form extends \moodleform {
             else if (\in_array($key,  ['deleted', 'suspended', 'emailstop', 'firstname', 'lastname', 'email'])) {
                 $this->_form->getElement('filter_' . $key)->setValue($value);
             } else if ($key === 'show_cols') {
-                $this->_form->getElement('show_cols')->setValue(str_replace(',', PHP_EOL, $value));
+                $this->_form->getElement('show_cols')->setValue($value);
             } else {
                 if ($this->_form->elementExists($key)) {
                     $this->_form->getElement($key)->setValue($value);

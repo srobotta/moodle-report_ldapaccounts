@@ -98,12 +98,8 @@ if (($mform->is_submitted() && $mform->is_validated())) {
     $ldapquerypart = \report_ldapaccounts\config::get_instance()->get_setting('ldapquery');
     $filterldapstatus = $mform->get_filter_ldapstatus();
     $userquery = $mform->get_user_query();
-    $userquery->set_selected_fields(array_unique(array_merge(
-            $userquery->get_selected_fields(),
-            ['deleted', 'suspended', 'emailstop'])
-    ));
+    $userquery->add_selected_fields(['deleted', 'suspended', 'emailstop', 'email']);
     $colstoshow = $mform->get_submitted_select_fields();
-    array_splice($colstoshow, array_search('id', $colstoshow) + 1, 0, ['ldap_status']);
     $table = new \report_ldapaccounts\user_table();
     $table->set_columns($colstoshow)
         ->enable_header(true)
