@@ -63,9 +63,9 @@ class report_form extends \moodleform {
         $this->add_any_no_yes('filter_emailstop');
 
         $this->_form->addElement('text', 'filter_firstname', $this->s('form_filter_firstname'));
-        $this->_form->setType('filter_firstname', PARAM_ALPHA);
+        $this->_form->setType('filter_firstname', PARAM_RAW_TRIMMED);
         $this->_form->addElement('text', 'filter_lastname', $this->s('form_filter_lastname'));
-        $this->_form->setType('filter_lastname', PARAM_ALPHA);
+        $this->_form->setType('filter_lastname', PARAM_RAW_TRIMMED);
         $this->_form->addElement('text', 'filter_email', $this->s('form_filter_email'));
         $this->_form->setType('filter_email', PARAM_RAW_TRIMMED);
         $this->add_any_no_yes('filter_ldapstatus');
