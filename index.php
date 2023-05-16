@@ -104,6 +104,7 @@ if (($mform->is_submitted() && $mform->is_validated())) {
     $table->set_columns($colstoshow)
         ->enable_header(true)
         ->set_show_action_delete(true)
+        ->set_show_action_suspend(true)
         ->set_show_action_profile(true)
         ->set_show_action_notification(true);
 

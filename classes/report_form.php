@@ -58,7 +58,7 @@ class report_form extends \moodleform {
                 $this->get_auth_methods()
             );
         }
-        $this->add_any_no_yes('filter_deleted');
+        $this->add_any_no_yes('filter_deleted')->setValue('0');
         $this->add_any_no_yes('filter_suspended');
         $this->add_any_no_yes('filter_emailstop');
 
@@ -103,12 +103,13 @@ class report_form extends \moodleform {
     /**
      * Add a selection with -1 => any, 0 => inactive, 1 => active element to the form. This is used for
      * filter columns like deleted, suspended.
+     * Returns reference to form element.
      * @param string $name
-     * @return void
+     * @return object
      * @throws \coding_exception
      */
-    protected function add_any_no_yes(string $name): void {
-        $this->_form->addElement(
+    protected function add_any_no_yes(string $name): object {
+        return $this->_form->addElement(
             'select',
             $name,
             get_string('form_' . $name, 'report_ldapaccounts'),

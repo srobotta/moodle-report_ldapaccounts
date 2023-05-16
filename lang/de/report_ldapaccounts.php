@@ -23,6 +23,7 @@
  */
 
 $string['callreport'] = 'Bericht aufrufen';
+$string['enable_emailstop'] = 'Benachrichtigungen einschalten';
 $string['form_csv_delimiter'] = 'CSV Trennzeichen';
 $string['form_download_csv'] = 'Download Bericht als CSV';
 $string['form_error_column'] = 'Das Feld {0} existiert nicht in der Benutzertabelle.';

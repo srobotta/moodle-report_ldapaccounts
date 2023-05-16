@@ -23,6 +23,7 @@
  */
 
 $string['callreport'] = 'Call report';
+$string['enable_emailstop'] = 'Enable notifications';
 $string['form_col_ldap_status'] = 'LDAP status';
 $string['form_csv_delimiter'] = 'CSV Delimiter';
 $string['form_download_csv'] = 'Download report as CSV';

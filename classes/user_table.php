@@ -45,6 +45,11 @@ class user_table {
     /**
      * @var bool
      */
+    private $showactionsuspend = false;
+
+    /**
+     * @var bool
+     */
     private $showactionnotification = false;
 
     /**
@@ -104,6 +109,22 @@ class user_table {
      * @param bool $val
      * @return user_table
      */
+    public function set_show_action_suspend(bool $val): user_table {
+        $this->showactionsuspend = $val;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_show_action_suspend(): bool {
+        return $this->showactionsuspend;
+    }
+
+    /**
+     * @param bool $val
+     * @return user_table
+     */
     public function set_show_action_notification(bool $val): user_table {
         $this->showactionnotification = $val;
         return $this;
@@ -157,25 +178,55 @@ class user_table {
         $row = [];
         foreach ($this->colunms as $col) {
             if (\in_array($col, ['currentlogin', 'lastlogin', 'timecreted', 'timemodified', 'firstaccess', 'lastaccess'])) {
-                $row[] = !empty($user->{$col}) ? userdate_htmltime($user->{$col}) : '';
+                $cell = !empty($user->{$col}) ? userdate_htmltime($user->{$col}) : '';
             } else {
-                $row[] = $user->{$col} ?? '';
+                $cell = $user->{$col} ?? '';
             }
+            $row[] = (int)$user->deleted === 1 ? '<s>' . $cell . '</s>' : $cell;
         }
         if ($this->showactionprofile) {
-            $row[] = '<a href="' . $CFG->httpswwwroot . '/user/profile.php?id=' . $user->id . '" target="blank">'
-                . get_string('userdetails', 'core') . '</a>';
+            $row[] = (int)$user->deleted === 1 ? '' :
+                '<a href="' . $CFG->httpswwwroot
+                    . '/user/profile.php?id=' . $user->id . '" target="blank"><i title="'
+                    . htmlspecialchars(get_string('userdetails', 'core'))
+                    . '" class="icon fa fa-cog fa-fw" rolw="img" aria-label="'
+                    . htmlspecialchars(get_string('userdetails', 'core'))
+                    . '"></i></a>';
         }
         if ($this->showactiondelete) {
             $row[] = (int)$user->deleted === 1 ? '' :
                 '<a href="' . $CFG->httpswwwroot . '/admin/user.php?sort=name&dir=ASC&perpage=30&page=0&delete='
-                    . $user->id . '&sesskey=' . sesskey() . '" target="blank">'
-                    . get_string('delete', 'core') . '</a>';
+                    . $user->id . '&sesskey=' . sesskey() . '" target="blank"><i title="'
+                    . htmlspecialchars(get_string('delete', 'core'))
+                    . '" class="icon fa fa-trash fa-fw" role="img" aria-label="'
+                    . htmlspecialchars(get_string('delete', 'core'))
+                    . '"></i></a>';
+        }
+        if ($this->showactionsuspend) {
+            if ((int)$user->suspended === 1) {
+                $action = 'unsuspend';
+                $icon = 'fa-eye-slash';
+            } else {
+                $action = 'suspend';
+                $icon = 'fa-eye';
+            }
+            $row[] = (int)$user->deleted === 1 ? '' :
+                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?sort=name&dir=ASC&perpage=30&page=0&'
+                    . $action . '=' . $user->id . '&sesskey=' . sesskey() . '" target="blank"><i title="'
+                    . htmlspecialchars(get_string($action . 'user', 'admin'))
+                    . '" class="icon fa ' . $icon . ' fa-fw" role="img" aria-label="'
+                    . htmlspecialchars(get_string($action . 'user', 'admin'))
+                    . '"></i></a>';
         }
         if ($this->showactionnotification) {
-            $row[] = (int)$user->emailstop === 1 ? '' :
+            $label = (int)$user->emailstop === 0
+                ? htmlspecialchars(get_string('emailstop', 'core'))
+                : htmlspecialchars(get_string('enable_emailstop', 'report_ldapaccounts'));
+            $row[] = (int)$user->deleted === 1 ? '' :
                 '<a href="' . $CFG->httpswwwroot . '/message/notificationpreferences.php?userid='
-                    . $user->id . '" target="blank">' . get_string('emailstop', 'core') . '</a>';
+                    . $user->id . '" target="blank"><i title="' . $label
+                    . '" class="icon fa fa-envelope fa-fw '. ($user->emailstop ? 'btn-secondary' : '')
+                    .'" role="img" aria-label="' . $label . '"></i></a>';
         }
         $this->table->data[] = $row;
         return $this;
@@ -192,10 +243,11 @@ class user_table {
     }
 
     /**
+     * @param bool $iscsv
      * @return user_table
      * @throws \coding_exception
      */
-    protected function build_header_row(): user_table {
+    protected function build_header_row(bool $iscsv = false): user_table {
         if ($this->colunms === null) {
             throw new \RuntimeException('columns must be set first');
         }
@@ -211,22 +263,52 @@ class user_table {
                 $totalheadertitles[] = get_string($col, 'core');
             }
         }
-        if ($this->showactionprofile) {
-            $totalheadertitles[] = get_string('userdetails', 'core');
+        if (!$iscsv) {
+            $colspan = 0;
+            if ($this->showactionprofile) {
+                $colspan++;
+            }
+            if ($this->showactiondelete) {
+                $colspan++;
+            }
+            if ($this->showactionsuspend) {
+                $colspan++;
+            }
+            if ($this->showactionnotification) {
+                $colspan++;
+            }
+            if ($colspan > 0) {
+                $totalheadertitles[] = get_string('edit', 'core');
+            }
+        } else {
+            if ($this->showactionprofile) {
+                $totalheadertitles[] = get_string('userdetails', 'core');
+            }
+            if ($this->showactiondelete) {
+                $totalheadertitles[] = get_string('delete', 'core');
+            }
+            if ($this->showactionsuspend) {
+                $totalheadertitles[] = get_string('suspenduser', 'admin');
+            }
+            if ($this->showactionnotification) {
+                $totalheadertitles[] = get_string('emailstop', 'core');
+            }
         }
-        if ($this->showactiondelete) {
-            $totalheadertitles[] = get_string('delete', 'core');
-        }
-        if ($this->showactionnotification) {
-            $totalheadertitles[] = get_string('emailstop', 'core');
-        }
-        foreach ($totalheadertitles as $totalheadertitle) {
-            $cell = new \html_table_cell($totalheadertitle);
+        foreach (\array_keys($totalheadertitles) as $t) {
+            $cell = new \html_table_cell($totalheadertitles[$t]);
             $cell->header = true;
+            if ($t + 1 === count($totalheadertitles) && !$iscsv && $colspan > 1) {
+                $cell->colspan = $colspan;
+            }
             $totalheadercells[] = $cell;
         }
         $headerrow->cells = $totalheadercells;
-        \array_unshift($this->table->data, $headerrow);
+        // If the first table row is already a header row, then replace the header with the new header row.
+        if (!empty($this->table->data) && $this->table->data[0] instanceof \html_table_row) {
+            $this->table->data[0] = $headerrow;
+        } else { // Otherwise just prepend the header row on top of the other rows.
+            \array_unshift($this->table->data, $headerrow);
+        }
         return $this;
     }
 
@@ -269,6 +351,9 @@ class user_table {
         $fp = fopen(self::get_dir() . DIRECTORY_SEPARATOR . $this->csvfile, 'w');
         if (!$fp) {
             throw new \RuntimeException('could not open csv file for writing');
+        }
+        if ($this->showheader) {
+            $this->build_header_row(true);
         }
         foreach ($this->table->data as $row) {
             fputcsv($fp, $this->prepare_csv_row($row), $delimiter, $quote, $escape, $eol);

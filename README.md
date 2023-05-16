@@ -107,16 +107,15 @@ criteria (i.e. exist in the LDAP or not).
 
 ### Display user data
 
-The field "columns" can contain any field name that exists in the user table. If
-the `id` field is not selected, it will be put automatically as the first place. The
-"LDAP status" field cannot be selected here and will be inserted right after
-the `id` field. Also, at the end the fields "User details", "Delete", and "Disable
-notifications" are added automatically. These contain links to the users profile
-page, to easily be able to delete, suspend or disable notifications for a user.
+The selection "columns" contains a list of field names that exist in the user table.
+In addition, the field `ldap_status` is here available as well to display whether
+the user exists in the LDAP directory. At the end of the selected column list
+the fields "User details", "Delete", "Suspend", and "Disable notifications" are added automatically.
+These contain links to the users profile page and links to delete the user
+account entirely or just disable notifications for a user.
+
 The `password` and the `secret` fields cannot be displayed. Custom defined user
 fields are also not considered.
-
-Each field name must be written on a separate line in the text area.
 
 ### CSV Download
 
