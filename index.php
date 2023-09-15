@@ -36,9 +36,13 @@ require_once($CFG->dirroot . '/course/lib.php');
 
 require_login();
 
+// Parameters that may come within the request.
+$csv = optional_param('csv', '', PARAM_ALPHANUM);
+$permalink = optional_param('permalink', '', PARAM_ALPHANUM);
+
 // CSV Download was triggered.
-if (isset($_REQUEST['csv'])) {
-    $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $_REQUEST['csv'] . '.csv';
+if (!empty($csv)) {
+    $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $csv . '.csv';
     if (!file_exists($csvfile)) {
         header('HTTP/1.0 404 not found');
         exit();
@@ -162,8 +166,8 @@ if (($mform->is_submitted() && $mform->is_validated())) {
 } else {
     // Form was not submitted yet.
     echo $OUTPUT->box(get_string('reportldapaccountsdesc', 'report_ldapaccounts') . "<br />&#160;", 'generalbox');
-    if (isset($_REQUEST['permalink'])) {
-        $mform->set_data_from_permalink($_REQUEST['permalink']);
+    if (!empty($permalink)) {
+        $mform->set_data_from_permalink($permalink);
     }
     $mform->display();
 }
