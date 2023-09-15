@@ -96,6 +96,12 @@ class ldap {
     private $logging;
 
     /**
+     * Name of the logfile (that includes the date).
+     * @var string
+     */
+    private $logfile;
+
+    /**
      * @param string $server
      * @param string $basedn
      * @param string $username
@@ -210,6 +216,30 @@ class ldap {
     }
 
     /**
+     * Get log file name. If $includedir is set to true, return the absolute path to the file. If the directory
+     * does not exist, try to create it.
+     *
+     * @param bool $includedir
+     * @return string
+     */
+    protected function get_logfile(bool $includedir = false): string {
+        global $CFG;
+        if ($this->logfile === null) {
+            $this->logfile = sprintf('ldap_debug_%s.log', date('Y-m-d'));
+        }
+        if ($includedir) {
+            // Directory where to store the csv files.
+            $dir = $CFG->dataroot . DIRECTORY_SEPARATOR . 'report_ldapaccounts';
+            if (!is_dir($dir) && !mkdir($dir, $CFG->directorypermissions)) {
+                throw new \RuntimeException('could not create directory for debug log');
+            }
+            return $dir . DIRECTORY_SEPARATOR . $this->logfile;
+        }
+        return $this->logfile;
+    }
+
+    /**
+     * Write a log file (which is basically a csv file with the ";" as separator.
      * @param string $filter
      * @param array $justthese
      * @param array|string $result
@@ -218,21 +248,35 @@ class ldap {
      */
     protected function log(string $filter, array $justthese, $result)
     {
+        global $USER;
         if (!$this->logging) {
             return;
         }
+        $uniqid = substr(md5(microtime()), 10, 25);
+        $time = date('Y-m-d H:i:s');
+        $remoteip = getremoteaddr();
         $data = [
-            'other' => [
-                'filter' => $filter,
-                'justthese' => implode(',', $justthese),
-                'result' => !is_string($result) ? json_encode($result) : $result,
-            ]
+            'filter' => $filter,
+            'justthese' => implode(',', $justthese),
+            'result' => (!is_string($result) ? json_encode($result) : $result),
         ];
-        $logger = event\log_debug::create($data);
-        $logger->trigger();
+
+        if (!$fp = @fopen($this->get_logfile(true), 'a')) {
+            return;
+        }
+        if(!flock($fp, LOCK_EX | LOCK_NB)) {
+            return;
+        }
+        foreach($data as $key => $row) {
+            fputcsv($fp, [$time, $uniqid, $remoteip, $USER->id, $key, $row], ';');
+        }
+        fflush($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
     }
 
     /**
+     * Perform an LDAP search.
      * @param array|string $searchfields
      * @param array|string|null $resultfields
      * @param string|null $fixedquerypart
