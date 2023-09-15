@@ -23,6 +23,19 @@
  */
 
 $string['callreport'] = 'Call report';
+$string['col_auth'] = 'Authentication';
+$string['col_policyagreed'] = 'Policy accepted';
+$string['col_mnethostid'] = 'MNet host ID';
+$string['col_lang'] = 'Language';
+$string['col_calendartype'] = 'Calendar';
+$string['col_currentlogin'] = 'Current login';
+$string['col_descriptionformat'] = 'Description format';
+$string['col_mailformat'] = 'Mail format';
+$string['col_maildigest'] = 'Mail digest';
+$string['col_maildisplay'] = 'Mail display';
+$string['col_timemodified'] = 'Time modified';
+$string['col_trustbitmask'] = 'Trust bit mask';
+$string['col_moodlenetprofile'] = 'MoodleNet profile';
 $string['enable_emailstop'] = 'Enable notifications';
 $string['form_col_ldap_status'] = 'LDAP status';
 $string['form_csv_delimiter'] = 'CSV Delimiter';
@@ -45,10 +58,12 @@ $string['ldapbasedn'] = 'LDAP base DN';
 $string['ldapbasedn_desc'] = 'The base DN is the root node where to query the LDAP server.';
 $string['ldapcacert'] = 'CA cert file';
 $string['ldapcacert_desc'] = 'Certificate file of the CA cert to validate the server. In case of an connection error you can provide the ca cert file by:
+
 1. Connect to the LDAP server via openssl s_client -connect example.com:636.
 2. Copy everything between and including -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----.
 3. Save the copied content into a file and store it on the server.
 4. Add the file location to this setting.
+
 ';
 $string['ldapcert'] = 'Cert file';
 $string['ldapcert_desc'] = 'Certificate file of the Moodle server itself, in case needed.';
@@ -67,10 +82,9 @@ $string['ldapuser'] = 'LDAP username';
 $string['ldapuser_desc'] = 'Name of the user that is used for the connection.';
 $string['log_debug'] = 'LDAP Debug';
 $string['logging'] = 'Enable logging';
-$string['logging_desc'] = 'Write all communication with the LDAP server into a log.';
+$string['logging_desc'] = 'Write all communication with the LDAP server into a debug log file.';
 $string['permalink'] = 'Permalink for this report';
 $string['pluginname'] = 'Moodle Accounts in LDAP';
 $string['privacy:metadata'] = 'Moodle Accounts in LDAP does not store any personal data in the default setup. However, personal data are written into the log file and the csv export file when these options are enabled or selected.';
 $string['reportldapaccountsdesc'] = 'Select accounts in Moodle and check whether these exist in LDAP.';
 $string['resultcount'] = '{0} Entries found.';
-$string['settings'] = 'Settings for Moodle Accounts in LDAP Report';

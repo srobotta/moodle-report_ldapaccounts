@@ -259,6 +259,12 @@ class user_table {
                 $totalheadertitles[] = 'ID';
             } else if ($col === 'ldap_status') {
                 $totalheadertitles[] = get_string('form_col_ldap_status', 'report_ldapaccounts');
+            } else if (\in_array($col, [
+                      'auth', 'policyagreed', 'mnethostid', 'lang', 'calendartype', 'currentlogin',
+                      'descriptionformat', 'mailformat', 'maildigest', 'maildisplay', 'timemodified', 'trustbitmask',
+                      'moodlenetprofile'
+            ])) {
+                $totalheadertitles[] = get_string('col_' . $col, 'report_ldapaccounts');
             } else {
                 $totalheadertitles[] = get_string($col, 'core');
             }

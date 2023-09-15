@@ -30,7 +30,7 @@ $ADMIN->add('reports', new admin_externalpage('reportldapaccounts', get_string('
 
 $settings = new admin_settingpage(
     'report_ldapaccounts_settings',
-    new lang_string('settings', 'report_ldapaccounts')
+    new lang_string('pluginname', 'report_ldapaccounts')
 );
 
 if ($ADMIN->fulltree) {
