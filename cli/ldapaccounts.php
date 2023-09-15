@@ -143,8 +143,8 @@ if (!empty($action)) {
 }
 
 
-$ldapmail = $options['ldapmail'] ?: \report_ldapaccounts\config::get_instance()->get_setting('ldapmailfield');
-$ldapquery = $options['ldapprefix'] ?: \report_ldapaccounts\config::get_instance()->get_setting('ldapquery');
+$ldapmail = $options['ldapmail'] ?? \report_ldapaccounts\config::get_instance()->get_setting('ldapmailfield');
+$ldapquery = $options['ldapprefix'] ?? \report_ldapaccounts\config::get_instance()->get_setting('ldapquery');
 
 
 // Prepare query for users in Moodle db.
