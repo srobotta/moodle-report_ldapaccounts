@@ -68,18 +68,35 @@ necessary (see also notes on Privacy below).
 
 In general the LDAP report just fetches data from the LDAP server and lists data
 in the report that are already in the Moodle database. However, there are two
-exceptions.
+exceptions when more data is stored and or stored at other places than the database.
+This is:
 
 - If the user selects to download the report as a CSV file, the data gets stored in
   a file that is located in the Moodle data directory. The file remains there until
   it's removed from an external job or manually by the Admin (see below).
 - For debug reasons logging can be enabled. This logs the entire communication between
-  Moodle and the LDAP server. The logs are stored in the database of Moodle and in
-  case of the LDAP response may contain personal information from the LDAP entries that
-  are not yet in Moodle and also will not be processed any further. By default, the
-  reports page fetches the email field only. The response contains the `mail` field
-  and the `dn` field only. On the command line the query may look more complex and
-  may contain additional data that would be in this case in the log as well.
+  Moodle and the LDAP server. The logs are stored in log files separated by date in the
+  data directory of Moodle. In case of the LDAP response it may contain personal
+  information from the LDAP entries that are not yet in Moodle and also will not be
+  processed any further.
+
+### Type of stored data
+
+As explained before, what is stored depends on the type of the LDAP request and the
+selection of the data to be fetched from the `user` table.
+
+When the option *Download report as CSV* is selected, any of the selected columns from the
+`user` table will be stored into the CSV file, except for the columns `password` and
+`secret`. These two are never exported.
+
+The CSV data remains in the `moodledata` directory until the file is deleted.
+
+The LDAP server may return many other values, depending on the query, e.g. which properties
+are selected from the data entity. By default, the query selects the `mail` field only, to
+match the entity from the LDAP result with the data set from the `user` table. However,
+if in the settings the *LDAP query* is filled to select other fields as well, or if in
+the cli script the query is expanded by the argument `--ldapquery` more data from the entity
+may be stored in the logs.
 
 ## Report page
 
