@@ -15,17 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * BFH e-learning report renderers.
+ * Renderer for ldap accounts report page.
  *
  * @package    report_ldapaccounts
- * @copyright  2016 BFH-ITS, Luca Bösch
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
-/**
- * Renderer for e-learning report as HTML.
- *
- * @copyright  2016 BFH-ITS, Luca Bösch
+ * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_ldapaccounts_renderer extends plugin_renderer_base {

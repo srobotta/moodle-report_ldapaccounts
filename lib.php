@@ -20,7 +20,7 @@
  * NOTE: page type not included because there can not be any blocks in popups
  *
  * @package    report_ldapaccounts
- * @copyright  2016 BFH-ITS, Luca Bösch
+ * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

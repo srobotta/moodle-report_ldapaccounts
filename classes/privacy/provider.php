@@ -19,7 +19,7 @@
  *
  * @package     report_ldapaccounts
  * @category    privacy
- * @copyright   2018 Luca Bösch <luca.boesch@bfh.ch>
+ * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,7 +28,7 @@ namespace report_ldapaccounts\privacy;
 /**
  * Privacy API implementation for the Outdated accounts not in LDAP plugin.
  *
- * @copyright  2018 Luca Bösch <luca.boesch@bfh.ch>
+ * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {

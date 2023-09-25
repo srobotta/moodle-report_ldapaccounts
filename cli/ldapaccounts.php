@@ -18,7 +18,7 @@
  * This script allows you to view and change the emailstop flag of any user.
  *
  * @package    ldapaccounts
- * @copyright  2023 Stephan Robotta (stephan.robotta@bfh.ch)
+ * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
