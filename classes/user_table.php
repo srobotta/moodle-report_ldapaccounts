@@ -319,21 +319,6 @@ class user_table {
     }
 
     /**
-     * Return the directory where the csv files are stored.
-     * @return string
-     */
-    public static function get_dir(): string {
-        global $CFG;
-
-        // Directory where to store the csv files.
-        $dir = $CFG->dataroot . DIRECTORY_SEPARATOR . 'report_ldapaccounts';
-        if (!is_dir($dir) && !mkdir($dir, $CFG->directorypermissions)) {
-            throw new \RuntimeException('could not create directory for saving csv file');
-        }
-        return $dir;
-    }
-
-    /**
      * Write the table using the html_writer.
      * @return void
      */
@@ -354,7 +339,7 @@ class user_table {
      */
     public function output_csv(string $delimiter = ',', string $quote = '"', string $escape = '\\', string $eol = PHP_EOL) {
         $this->csvfile = md5(microtime()) . '.csv';
-        $fp = fopen(self::get_dir() . DIRECTORY_SEPARATOR . $this->csvfile, 'w');
+        $fp = fopen(config::get_plugin_file_dir() . DIRECTORY_SEPARATOR . $this->csvfile, 'w');
         if (!$fp) {
             throw new \RuntimeException('could not open csv file for writing');
         }

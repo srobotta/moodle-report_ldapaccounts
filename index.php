@@ -42,7 +42,7 @@ $permalink = optional_param('permalink', '', PARAM_ALPHANUM);
 
 // CSV Download was triggered.
 if (!empty($csv)) {
-    $csvfile = \report_ldapaccounts\user_table::get_dir() . DIRECTORY_SEPARATOR . $csv . '.csv';
+    $csvfile = \report_ldapaccounts\config::get_plugin_file_dir() . DIRECTORY_SEPARATOR . $csv . '.csv';
     if (!file_exists($csvfile)) {
         header('HTTP/1.0 404 not found');
         exit();

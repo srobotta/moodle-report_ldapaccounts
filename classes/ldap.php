@@ -228,12 +228,8 @@ class ldap {
             $this->logfile = sprintf('ldap_debug_%s.log', date('Y-m-d'));
         }
         if ($includedir) {
-            // Directory where to store the csv files.
-            $dir = $CFG->dataroot . DIRECTORY_SEPARATOR . 'report_ldapaccounts';
-            if (!is_dir($dir) && !mkdir($dir, $CFG->directorypermissions)) {
-                throw new \RuntimeException('could not create directory for debug log');
-            }
-            return $dir . DIRECTORY_SEPARATOR . $this->logfile;
+            // Add directory where to store the log files.
+            return config::get_plugin_file_dir() . DIRECTORY_SEPARATOR . $this->logfile;
         }
         return $this->logfile;
     }

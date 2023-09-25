@@ -74,6 +74,21 @@ class config {
     }
 
     /**
+     * Return the directory where the plugin generated files (csv and debug log) are stored.
+     * @return string
+     */
+    public static function get_plugin_file_dir(): string {
+        global $CFG;
+
+        // Directory where to store the csv files.
+        $dir = $CFG->tempdir . DIRECTORY_SEPARATOR . 'report_ldapaccounts';
+        if (!is_dir($dir) && !mkdir($dir, $CFG->directorypermissions)) {
+            throw new \RuntimeException('could not create temp directory for plugin user files');
+        }
+        return $dir;
+    }
+
+    /**
      * Fetch values from database.
      * @return array
      * @throws \dml_exception
