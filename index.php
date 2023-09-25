@@ -15,26 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Displays outdated Moodle user accounts.
+ * Displays Moodle user accounts and match them with a configured LDAP.
  * @package    report_ldapaccounts
  * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-/**
- * Moodle Outdated accounts not in LDAP Report
- *
- * Main file for report
- *
- * @see doc/html/ for documentation
- *
- */
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->libdir . '/adminlib.php');
-require_once($CFG->libdir . '/accesslib.php');
-require_once($CFG->dirroot . '/lib/statslib.php');
-require_once($CFG->dirroot . '/course/lib.php');
 
 require_login();
+if (!has_capability('report/ldapaccounts:view', context::instance_by_id(CONTEXT_SYSTEM, MUST_EXIST))) {
+    throw new \moodle_exception('nopermissiontoaccesspage', 'error');
+}
 
 // Parameters that may come within the request.
 $csv = optional_param('csv', '', PARAM_ALPHANUM);
