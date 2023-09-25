@@ -20,7 +20,7 @@ connection from/to Moodle.
 
 Whenever a user drops out of the institution the identity provider will not allow to
 log him in anymore. However, the account in Moodle is still active and emails may be
-send out to the users email address.
+sent out to the users email address.
 
 Therefore, there is a need to detect such users and disable or delete them from Moodle
 once they do not yet exist in the LDAP anymore. The CLI script should automate the
@@ -89,8 +89,6 @@ When the option *Download report as CSV* is selected, any of the selected column
 `user` table will be stored into the CSV file, except for the columns `password` and
 `secret`. These two are never exported.
 
-The CSV data remains in the *moodledata* directory until the file is deleted.
-
 The LDAP server may return many other values, depending on the query, e.g. which properties
 are selected from the data entity. By default, the query selects the `mail` field only, to
 match the entity from the LDAP result with the data set from the `user` table. However,
@@ -100,7 +98,7 @@ may be stored in the logs.
 
 ### Data location
 
-Both, the csv files for downloading and the log files are stored in *moodledata* in a
+Both, the csv files for downloading and the log files are stored in *moodletemp* in a
 sub directory `report_ldapaccounts`. Logfiles have the date included when they were
 written.
 
