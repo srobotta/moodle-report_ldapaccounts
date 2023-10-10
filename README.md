@@ -53,7 +53,7 @@ There is a list of fields with the LDAP prefix that handle the connection to the
 server. You may also provide certificate files for the connection in case necessary.
 
 The setting "Email field in LDAP" may contain a different field name where the email
-is stored in the LDAP directory. By default this is `mail`.
+is stored in the LDAP directory. By default, this is `mail`.
 
 The setting "LDAP Query" may contain some additional LDAP query parameters to select
 an user. Imagine the use case that the LDAP directory contains person and institution
@@ -228,3 +228,14 @@ Possible future changes could be:
   more that 30k records within less than a minute, therefore we use the direct way
   to display the data.
 - A command that deletes old CSV files that have been generated before a certain time.
+
+## Version history
+
+### v1.1
+
+- Verified compatibility with Moodle 4.3.
+- Lift maturity level to stable.
+
+### v1.0-rc4
+
+Initial release that had been approved into the Moodle plugins directory.
