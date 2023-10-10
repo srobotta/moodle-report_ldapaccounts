@@ -14,22 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Defines {@link \report_ldapaccounts\config} class. This defined and reads all settings that
- * are required for this plugin.
- *
- * @package     report_ldapaccounts
- * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace report_ldapaccounts;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/adminlib.php');
 
+/**
+ * Helper class for settings that are required for this plugin.
+ *
+ * @package     report_ldapaccounts
+ * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class config {
+
     /**
      * Singleton instance is stored here.
      * @var config

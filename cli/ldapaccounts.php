@@ -17,7 +17,7 @@
 /**
  * This script allows you to view and change the emailstop flag of any user.
  *
- * @package    ldapaccounts
+ * @package    report_ldapaccounts
  * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -100,9 +100,9 @@ Options:
                  table.
 -h, --help       Print out this help
 -m, --ldapmail   The ldap mail field where to look up emails. If not set
-                 the setting `report_ldapaccounts | ldapmailfield` is used.
+                 the setting \"report_ldapaccounts | ldapmailfield\" is used.
 -q, --ldapquery  Query prefix that is prepend to all LDAP queries. If not
-                 set the setting `report_ldapaccounts | ldapquery` is used.
+                 set the setting \"report_ldapaccounts | ldapquery\" is used.
 -s, --silent     No output to stdout.
 
 Example:

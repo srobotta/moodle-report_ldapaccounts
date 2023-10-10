@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines {@link \report_ldapaccounts\privacy\provider} class.
+ * Defines \report_ldapaccounts\privacy\provider class.
  *
  * @package     report_ldapaccounts
  * @category    privacy

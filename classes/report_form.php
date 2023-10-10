@@ -14,24 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * Defines {@link \report_ldapaccounts\user_form} class.
- * Form to select user data and fields to display at the report page.
- *
- * @package     report_ldapaccounts
- * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-
 namespace report_ldapaccounts;
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/formslib.php');
 
+/**
+ * Form to select user data and fields to display at the report page.
+ *
+ * @package     report_ldapaccounts
+ * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class report_form extends \moodleform {
 
     /**
+     * List of authentication method values that can be selected from.
      * @var array
      */
     private $authmethods;
@@ -122,8 +121,9 @@ class report_form extends \moodleform {
     }
 
     /**
-     * @param $data
-     * @param $files
+     * Validate the input received in the post request.
+     * @param array $data
+     * @param array $files
      * @return array
      * @throws \coding_exception
      */
@@ -210,6 +210,7 @@ class report_form extends \moodleform {
     }
 
     /**
+     * Get filter for LDAP status (-1 not set, 0 not in LDAP, 1 in LDAP)
      * @return int
      */
     public function get_filter_ldapstatus(): int {
@@ -221,6 +222,7 @@ class report_form extends \moodleform {
     }
 
     /**
+     * Get list of columns that are in the selection.
      * @return array
      */
     public function get_submitted_select_fields(): array {
@@ -260,8 +262,7 @@ class report_form extends \moodleform {
      * @return string
      * @throws \dml_exception
      */
-    public function get_permalink_param(): string
-    {
+    public function get_permalink_param(): string {
         $data = [];
         foreach (get_object_vars($this->get_submitted_data()) as $property => $value) {
             $value = \is_array($value) ? implode($value) : trim($value);
@@ -308,8 +309,7 @@ class report_form extends \moodleform {
                 if ($idx > -1) {
                     $this->_form->getElement('filter_auth')->setValue($idx);
                 }
-            }
-            else if (\in_array($key,  ['deleted', 'suspended', 'emailstop', 'firstname', 'lastname', 'email'])) {
+            } else if (\in_array($key,  ['deleted', 'suspended', 'emailstop', 'firstname', 'lastname', 'email'])) {
                 $this->_form->getElement('filter_' . $key)->setValue($value);
             } else if ($key === 'show_cols') {
                 $this->_form->getElement('show_cols')->setValue($value);

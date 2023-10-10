@@ -14,19 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace report_ldapaccounts;
+
 /**
- * Defines {@link \report_ldapaccounts\ldap} class.
  * This class handles the LDAP communication and encapsulates it from the caller.
  *
  * @package     report_ldapaccounts
  * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace report_ldapaccounts;
-
-use LDAP\Connection;
-
 class ldap {
 
     /**
@@ -73,7 +69,7 @@ class ldap {
 
     /**
      * The LDAP connection once established.
-     * @var resource|Connection
+     * @var resource|\LDAP\Connection
      */
     private $ldap;
 
@@ -102,6 +98,7 @@ class ldap {
     private $logfile;
 
     /**
+     * The constructor to inject the LDAP server settings.
      * @param string $server
      * @param string $basedn
      * @param string $username
@@ -164,6 +161,7 @@ class ldap {
     }
 
     /**
+     * Set certfile for authentication with the LDAP server.
      * @param string $certfile
      * @return ldap
      */
@@ -173,6 +171,7 @@ class ldap {
     }
 
     /**
+     * Set ca certfile for authentication with the LDAP server.
      * @param string $cacertfile
      * @return ldap
      */
@@ -183,7 +182,7 @@ class ldap {
 
     /**
      * Prior to PHP8.1 a resource is returned.
-     * @return resource|Connection
+     * @return resource|\LDAP\Connection
      */
     protected function get_connection() {
         if ($this->ldap === null) {
@@ -223,7 +222,6 @@ class ldap {
      * @return string
      */
     protected function get_logfile(bool $includedir = false): string {
-        global $CFG;
         if ($this->logfile === null) {
             $this->logfile = sprintf('ldap_debug_%s.log', date('Y-m-d'));
         }
@@ -242,8 +240,7 @@ class ldap {
      * @return void
      * @throws \coding_exception
      */
-    protected function log(string $filter, array $justthese, $result)
-    {
+    protected function log(string $filter, array $justthese, $result) {
         global $USER;
         if (!$this->logging) {
             return;
@@ -260,10 +257,10 @@ class ldap {
         if (!$fp = @fopen($this->get_logfile(true), 'a')) {
             return;
         }
-        if(!flock($fp, LOCK_EX | LOCK_NB)) {
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
             return;
         }
-        foreach($data as $key => $row) {
+        foreach ($data as $key => $row) {
             fputcsv($fp, [$time, $uniqid, $remoteip, $USER->id, $key, $row], ';');
         }
         fflush($fp);
@@ -346,7 +343,7 @@ class ldap {
 
     /**
      * From the input format a query string for the ldap search.
-     * @param $searchfields
+     * @param string|array $searchfields
      * @return string
      */
     protected function get_filter($searchfields): string {
@@ -377,7 +374,7 @@ class ldap {
 
     /**
      * Format the result fields into an array that can be used in a ldap query.
-     * @param $resultfields
+     * @param string|array|null $resultfields
      * @return array
      */
     protected function get_result_fields($resultfields = null): array {

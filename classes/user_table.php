@@ -14,17 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace report_ldapaccounts;
+
 /**
- * Defines {@link \report_ldapaccounts\user_table} class.
- * Table to display user list at the report page.
+ * Defines user_table class to display user list at the report page.
  *
  * @package     report_ldapaccounts
  * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace report_ldapaccounts;
-
 class user_table {
 
     /**
@@ -75,6 +73,7 @@ class user_table {
     }
 
     /**
+     * Enable/disable column for link to user settings.
      * @param bool $val
      */
     public function set_show_action_profile(bool $val): user_table {
@@ -83,6 +82,7 @@ class user_table {
     }
 
     /**
+     * Check whether column for link to user settings is enabled or disabled.
      * @return bool
      */
     public function is_show_action_profile(): bool {
@@ -90,6 +90,7 @@ class user_table {
     }
 
     /**
+     * Enable/disable column for user deletion action.
      * @param bool $val
      * @return user_table
      */
@@ -99,6 +100,7 @@ class user_table {
     }
 
     /**
+     * Check whether column for user deletion action is enabled or disabled.
      * @return bool
      */
     public function is_show_action_delete(): bool {
@@ -106,6 +108,7 @@ class user_table {
     }
 
     /**
+     * Enable/disable column for user suspend action.
      * @param bool $val
      * @return user_table
      */
@@ -115,6 +118,7 @@ class user_table {
     }
 
     /**
+     * Check whether column for user suspend action is enabled or disabled.
      * @return bool
      */
     public function is_show_action_suspend(): bool {
@@ -122,6 +126,7 @@ class user_table {
     }
 
     /**
+     * Enable/disable column for user notification settings.
      * @param bool $val
      * @return user_table
      */
@@ -131,6 +136,7 @@ class user_table {
     }
 
     /**
+     * Check whether column for user notification settings is enabled or disabled.
      * @return bool
      */
     public function is_show_action_notification(): bool {
@@ -138,6 +144,7 @@ class user_table {
     }
 
     /**
+     * Set list of columns to be included in table.
      * @param array $cols
      * @return user_table
      */
@@ -158,12 +165,12 @@ class user_table {
      * Returns the name of the csv file in case one was written.
      * @return string|null
      */
-    public function get_csvfile(): ?string
-    {
+    public function get_csvfile(): ?string {
         return $this->csvfile;
     }
 
     /**
+     * Add a new table row with user data.
      * @param \stdClass $user
      * @return user_table
      * @throws \coding_exception
@@ -233,6 +240,7 @@ class user_table {
     }
 
     /**
+     * Enable the table header with column names.
      * @param bool $val
      * @return $this
      * @throws \coding_exception
@@ -243,6 +251,7 @@ class user_table {
     }
 
     /**
+     * Create the table header with column names.
      * @param bool $iscsv
      * @return user_table
      * @throws \coding_exception

@@ -80,7 +80,6 @@ $string['ldapserver'] = 'LDAP server';
 $string['ldapserver_desc'] = 'Server domain or IP where to connect to.';
 $string['ldapuser'] = 'LDAP username';
 $string['ldapuser_desc'] = 'Name of the user that is used for the connection.';
-$string['log_debug'] = 'LDAP Debug';
 $string['logging'] = 'Enable logging';
 $string['logging_desc'] = 'Write all communication with the LDAP server into a debug log file.';
 $string['permalink'] = 'Permalink for this report';

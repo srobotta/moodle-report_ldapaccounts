@@ -14,18 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace report_ldapaccounts;
+
 /**
- * Defines {@link \report_ldapaccounts\user_query} class.
- * Encapsulates selecting users from the database, and handles chunks of data to prevent fetching all data
- * at once.
+ * Encapsulates selecting users from the database, and handles chunks of data to prevent fetching all data at once.
  *
  * @package     report_ldapaccounts
  * @copyright   2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-namespace report_ldapaccounts;
-
 class user_query {
 
     /**
@@ -71,6 +68,8 @@ class user_query {
     private $recordcnt;
 
     /**
+     * Constructor to setup the query.
+     *
      * @param array|null $fields
      * @param array|null $filter
      * @param int|null $size
@@ -106,7 +105,7 @@ class user_query {
     /**
      * A simplified filter setting, used in the cli script. Instead of using an array for filter term and operator,
      * these two values are combined in one, prefixed by the operator. The wildcard is the *.
-     * Examples are: {"deleted":0,"email":"*@example.org"} -> active users that have an email in example.org
+     * Examples are: {"deleted":0,"email":"*example.org"} -> active users that have an email in example.org
      *
      * @param string $json
      * @return user_query
@@ -153,7 +152,7 @@ class user_query {
      */
     public function add_selected_fields(array $fields): self {
         $this->validate_fields($fields);
-        foreach($fields as $field) {
+        foreach ($fields as $field) {
             if (!\in_array($field, $this->selectedfields)) {
                 $this->selectedfields[] = $field;
             }
@@ -162,6 +161,7 @@ class user_query {
     }
 
     /**
+     * Get a list of fields that are selected.
      * @return array
      */
     public function get_selected_fields(): array {
@@ -202,6 +202,7 @@ class user_query {
     }
 
     /**
+     * Set number of results for one batch.
      * @param int $size
      * @return user_query
      */
@@ -214,6 +215,7 @@ class user_query {
     }
 
     /**
+     * Set current page to be fetched.
      * @param int $page
      * @return user_query
      */

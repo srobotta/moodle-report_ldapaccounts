@@ -64,7 +64,6 @@ $string['ldapserver'] = 'LDAP server';
 $string['ldapserver_desc'] = 'Servername oder IP über welche der Dienst erreichbar ist.';
 $string['ldapuser'] = 'LDAP Benutzer';
 $string['ldapuser_desc'] = 'Der Name des Benutzers welcher sich mit dem Server verbinden soll.';
-$string['log_debug'] = 'LDAP Debug';
 $string['logging'] = 'Aktiviere Logs für LDAP Kommunikation';
 $string['logging_desc'] = 'Alle Anfragen und Antworten zum LDAP Server werden im Log protokolliert.';
 $string['permalink'] = 'Direktlink für diesen Bericht';

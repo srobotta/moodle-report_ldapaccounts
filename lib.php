@@ -27,8 +27,8 @@
 /**
  * This function extends the navigation with the report items
  *
- * @param settings_node $navigation The navigation node to extend
- * @param stdClass $context The context of the course
+ * @param settings_navigation $navigation The navigation node to extend
+ * @param context $context The context of the course
  */
 function report_ldapaccounts_extend_settings_navigation(settings_navigation $navigation, context $context) {
     global $CFG, $OUTPUT;
