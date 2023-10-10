@@ -235,6 +235,7 @@ Possible future changes could be:
 
 - Verified compatibility with Moodle 4.3.
 - Lift maturity level to stable.
+- Fix: [Consider adding github action support - its free and useful.](https://github.com/srobotta/moodle-report_ldapaccounts/issues/3)
 
 ### v1.0-rc4
 
