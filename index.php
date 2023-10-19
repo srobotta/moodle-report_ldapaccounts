@@ -23,7 +23,7 @@
 require_once(__DIR__ . '/../../config.php');
 
 require_login();
-if (!has_capability('report/ldapaccounts:view', context::instance_by_id(CONTEXT_SYSTEM, MUST_EXIST))) {
+if (!has_capability('report/ldapaccounts:view', context_system::instance())) {
     throw new \moodle_exception('nopermissiontoaccesspage', 'error');
 }
 
