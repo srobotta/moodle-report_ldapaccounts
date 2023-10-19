@@ -231,6 +231,11 @@ Possible future changes could be:
 
 ## Version history
 
+### Current master
+
+-  [Fix instantiating system context #5](https://github.com/srobotta/moodle-report_ldapaccounts/pull/5).
+Thank you, [Simon Schoenenberger](https://github.com/detomon)
+
 ### v1.1
 
 - Verified compatibility with Moodle 4.3.
