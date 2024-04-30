@@ -24,15 +24,15 @@
 
 $string['callreport'] = 'Call report';
 $string['col_auth'] = 'Authentication';
-$string['col_policyagreed'] = 'Policy accepted';
-$string['col_mnethostid'] = 'MNet host ID';
-$string['col_lang'] = 'Language';
 $string['col_calendartype'] = 'Calendar';
 $string['col_currentlogin'] = 'Current login';
 $string['col_descriptionformat'] = 'Description format';
+$string['col_lang'] = 'Language';
 $string['col_mailformat'] = 'Mail format';
 $string['col_maildigest'] = 'Mail digest';
 $string['col_maildisplay'] = 'Mail display';
+$string['col_mnethostid'] = 'MNet host ID';
+$string['col_policyagreed'] = 'Policy accepted';
 $string['col_timemodified'] = 'Time modified';
 $string['col_trustbitmask'] = 'Trust bit mask';
 $string['col_moodlenetprofile'] = 'MoodleNet profile';
@@ -67,8 +67,8 @@ $string['ldapcacert_desc'] = 'Certificate file of the CA cert to validate the se
 ';
 $string['ldapcert'] = 'Cert file';
 $string['ldapcert_desc'] = 'Certificate file of the Moodle server itself, in case needed.';
-$string['ldapmailfield_desc'] = 'The name of the field where the mail address of a user is stored in LDAP.';
 $string['ldapmailfield'] = 'E-Mail field in LDAP';
+$string['ldapmailfield_desc'] = 'The name of the field where the mail address of a user is stored in LDAP.';
 $string['ldapnotconfigured'] = 'LDAP Connection has not been defined yet. Please go to the [link]settings page[/link].';
 $string['ldappass'] = 'LDAP password';
 $string['ldappass_desc'] = 'Password of the LDAP user to be used for the connection.';

@@ -16,10 +16,16 @@
 
 /**
  * Displays Moodle user accounts and match them with a configured LDAP.
+ *
+ * This report lets you check your user accounts in Moodle with the users
+ * in your LDAP server. You can filter the users by their LDAP status and
+ * enable/disable them automatically.
+ *
  * @package    report_ldapaccounts
  * @copyright  2023 Stephan Robotta <stephan.robotta@bfh.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(__DIR__ . '/../../config.php');
 
 require_login();

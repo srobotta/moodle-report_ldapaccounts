@@ -193,7 +193,7 @@ class ldap {
                 ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $this->cacertfile);
             }
 
-            $this->ldap = ldap_connect($this->server, $this->port);
+            $this->ldap = ldap_connect("{$this->server}:{$this->port}");
             if ($this->ldap === false) {
                 throw new \RuntimeException('Could not connect to server');
             }

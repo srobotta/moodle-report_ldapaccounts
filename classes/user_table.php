@@ -271,7 +271,7 @@ class user_table {
             } else if (\in_array($col, [
                       'auth', 'policyagreed', 'mnethostid', 'lang', 'calendartype', 'currentlogin',
                       'descriptionformat', 'mailformat', 'maildigest', 'maildisplay', 'timemodified', 'trustbitmask',
-                      'moodlenetprofile'
+                      'moodlenetprofile',
             ])) {
                 $totalheadertitles[] = get_string('col_' . $col, 'report_ldapaccounts');
             } else {
