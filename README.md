@@ -231,10 +231,11 @@ Possible future changes could be:
 
 ## Version history
 
-### Current master
+### v1.2
 
--  [Fix instantiating system context #5](https://github.com/srobotta/moodle-report_ldapaccounts/pull/5).
+- [Fix instantiating system context #5](https://github.com/srobotta/moodle-report_ldapaccounts/pull/5).
 Thank you, [Simon Schoenenberger](https://github.com/detomon)
+- Update ci for Moodle 4.4 and PHP 8.3
 
 ### v1.1
 
