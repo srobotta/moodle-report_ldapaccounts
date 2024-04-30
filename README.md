@@ -1,5 +1,12 @@
 # Report LDAP User Accounts
 
+![Release](https://img.shields.io/badge/Release-1.2-blue.svg)
+[![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/workflows/Moodle%20Plugin%20CI/badge.svg?branch=master)](https://github.com/srobotta/moodle-report_ldapaccounts/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amaster)
+[![PHP Support](https://img.shields.io/badge/php-7.4--8.3-blue)](https://github.com/srobotta/moodle-report_ldapaccounts/actions)
+[![Moodle Support](https://img.shields.io/badge/Moodle-4.1--4.4+-orange)](https://github.com/srobotta/moodle-report_ldapaccounts/actions)
+[![License GPL-3.0](https://img.shields.io/github/license/srobotta/moodle-report_ldapaccounts?color=lightgrey)](https://github.com/srobotta/moodle-report_ldapaccounts/blob/master/LICENSE)
+[![GitHub contributors](https://img.shields.io/github/contributors/srobotta/moodle-report_ldapaccounts)](https://github.com/srobotta/moodle-report_ldapaccounts/graphs/contributors)
+
 This plugin displays a report page and matches user accounts in Moodle with an LDAP
 directory in the organisation. Various filters can be used
 to select users. The report may also be exported.
