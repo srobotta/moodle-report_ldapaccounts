@@ -270,12 +270,16 @@ class ldap {
 
     /**
      * Perform an LDAP search.
+     * Serchfields contains the where part, what to search for.
+     * Resultfields contains the fields that should be returned from the LDAP server.
+     * The fixed query part sind something that is always used for the where part, independent of the searchfields.
+     * It can be used to limit the search to a specific object class for example (e.g. (&(objectClass=person)(objectClass=top))).
      * @param array|string $searchfields
      * @param array|string|null $resultfields
      * @param string|null $fixedquerypart
      * @return ldap
      */
-    public function search($searchfields, $resultfields = null, string $fixedquerypart = null): ldap {
+    public function search($searchfields, $resultfields = null, ?string $fixedquerypart = null): ldap {
         $filter = $fixedquerypart . $this->get_filter($searchfields);
         $justthese = $this->get_result_fields($resultfields);
         $search = ldap_search($this->get_connection(), $this->basedn, $filter, $justthese);

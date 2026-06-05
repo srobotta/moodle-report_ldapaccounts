@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['authmethoddisabled'] = 'The authentication method {$a} is not available.';
 $string['callreport'] = 'Call report';
 $string['col_auth'] = 'Authentication';
 $string['col_calendartype'] = 'Calendar';
@@ -54,6 +55,7 @@ $string['form_filter_userdata'] = 'Filter user data';
 $string['form_show_cols'] = 'Columns';
 $string['form_show_userdata'] = 'Display user data';
 $string['ldapaccounts:view'] = 'View accounts in LDAP';
+$string['ldapaccountsynctask'] = 'LDAP accounts sync task';
 $string['ldapbasedn'] = 'LDAP base DN';
 $string['ldapbasedn_desc'] = 'The base DN is the root node where to query the LDAP server.';
 $string['ldapcacert'] = 'CA cert file';
@@ -80,6 +82,8 @@ $string['ldapserver'] = 'LDAP server';
 $string['ldapserver_desc'] = 'Server domain or IP where to connect to.';
 $string['ldapuser'] = 'LDAP username';
 $string['ldapuser_desc'] = 'Name of the user that is used for the connection.';
+$string['ldapusernamefield'] = 'Username / IDM field in LDAP';
+$string['ldapusernamefield_desc'] = 'The name of the field in LDAP that is used for SSO user authentication and in Moodle used as the username for new accounts created by this plugin and used by SSO.';
 $string['logging'] = 'Enable logging';
 $string['logging_desc'] = 'Write all communication with the LDAP server into a debug log file.';
 $string['permalink'] = 'Permalink for this report';
@@ -87,3 +91,11 @@ $string['pluginname'] = 'Moodle Accounts in LDAP';
 $string['privacy:metadata'] = 'Moodle Accounts in LDAP does not store any personal data in the default setup. However, personal data are written into the log file and the csv export file when these options are enabled or selected.';
 $string['reportldapaccountsdesc'] = 'Select accounts in Moodle and check whether these exist in LDAP.';
 $string['resultcount'] = '{0} Entries found.';
+$string['settings_header_0'] = 'LDAP connection settings';
+$string['settings_header_0_desc'] = 'These settings refer on how to connect to your LDAP server.';
+$string['settings_header_1'] = 'LDAP fields and query settings';
+$string['settings_header_1_desc'] = 'Here specific LDAP fields and assumptions are stored, so that the plugin can fetch the relevant data from the LDAP server.';
+$string['syncauthmethod'] = 'Authentication method for synchronized users';
+$string['syncauthmethod_desc'] = 'Select the authentication method that will be assigned to users created by the sync task. Users will authenticate through this method instead of using a password.';
+$string['synctimeinvalid'] = 'The given datetime string is invalid';
+$string['userdescription'] = 'Account created on {$a} by report_ldapaccounts/sync_accounts';

@@ -106,7 +106,7 @@ Options:
 -s, --silent     No output to stdout.
 
 Example:
-\$sudo -u www-data /usr/bin/php report/ldapaccounts/cli/ldapaccounts.php -f='{\"deleted\":0,\"email\":\"*example.org\"}'
+\$sudo -u www-data /usr/bin/php public/report/ldapaccounts/cli/ldapaccounts.php -f='{\"deleted\":0,\"email\":\"*example.org\"}'
 ";
 
     echo $help;
