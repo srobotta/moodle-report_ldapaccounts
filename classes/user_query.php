@@ -97,7 +97,6 @@ class user_query {
         $this->validate_fields(\array_keys($filter));
         $this->filter = $filter;
         $this->where = null;
-        $this->maxrecords = null;
         return $this;
     }
 
@@ -308,8 +307,6 @@ class user_query {
         } else {
             $users = $DB->get_records_sql($sql, $this->get_args());
         }
-        // Set is empty property.
-        $this->isempty = empty($users);
         return $users;
     }
 

@@ -201,7 +201,7 @@ class user_table {
         }
         if ($this->showactiondelete) {
             $row[] = (int)$user->deleted === 1 ? '' :
-                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?sort=name&dir=ASC&perpage=30&page=0&delete='
+                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?delete='
                     . $user->id . '&sesskey=' . sesskey() . '" target="blank"><i title="'
                     . htmlspecialchars(get_string('delete', 'core'))
                     . '" class="icon fa fa-trash fa-fw" role="img" aria-label="'
@@ -217,7 +217,7 @@ class user_table {
                 $icon = 'fa-eye';
             }
             $row[] = (int)$user->deleted === 1 ? '' :
-                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?sort=name&dir=ASC&perpage=30&page=0&'
+                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?'
                     . $action . '=' . $user->id . '&sesskey=' . sesskey() . '" target="blank"><i title="'
                     . htmlspecialchars(get_string($action . 'user', 'admin'))
                     . '" class="icon fa ' . $icon . ' fa-fw" role="img" aria-label="'
