@@ -18,7 +18,7 @@ namespace report_ldapaccounts;
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->libdir . '/adminlib.php');
 
 /**
  * Helper class for settings that are required for this plugin.
@@ -28,7 +28,6 @@ require_once($CFG->libdir.'/adminlib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class config {
-
     /**
      * Singleton instance is stored here.
      * @var config
@@ -183,6 +182,7 @@ class config {
 
     /**
      * Check if given auth method is valid.
+     * @param string $method
      * @return bool
      */
     public static function is_valid_auth_method(string $method): bool {

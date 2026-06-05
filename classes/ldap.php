@@ -24,7 +24,6 @@ namespace report_ldapaccounts;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class ldap {
-
     /**
      * LDAP username.
      * @var string

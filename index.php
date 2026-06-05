@@ -71,7 +71,8 @@ $PAGE->set_title($SITE->fullname . ': ' . get_string('pluginname', 'report_ldapa
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('pluginname', 'report_ldapaccounts'));
 
-if (empty(\report_ldapaccounts\config::get_instance()->get_setting('server')) ||
+if (
+    empty(\report_ldapaccounts\config::get_instance()->get_setting('server')) ||
     empty(\report_ldapaccounts\config::get_instance()->get_setting('user'))
 ) {
     $text = get_string('ldapnotconfigured', 'report_ldapaccounts');
@@ -150,7 +151,7 @@ if (($mform->is_submitted() && $mform->is_validated())) {
     if ($mform->is_csv_download()) {
         $table->output_csv($mform->get_csv_delimiter());
         echo \html_writer::link(new moodle_url(
-          '/report/ldapaccounts/',
+            '/report/ldapaccounts/',
             ['csv' => str_replace('.csv', '', $table->get_csvfile())]
         ), get_string('form_download_csv', 'report_ldapaccounts'));
         echo '&nbsp;|&nbsp;';

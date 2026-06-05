@@ -110,7 +110,7 @@ if (!$dryrun && !config::get_instance()->is_valid_auth_method($authmethod)) {
         cli_error(get_string('authmethoddisabled', 'report_ldapaccounts', $authmethod), $exitunknownoption);
     }
     exit($exitauthmethoddisabled);
-} 
+}
 
 try {
     if ($dryrun) {
@@ -121,7 +121,7 @@ try {
         ->set_authmethod($authmethod)
         ->set_lastsync($date)
         ->exec($dryrun);
-    
+
     if ($verbose) {
         foreach ($sync->get_log() as $line) {
             echo $line . PHP_EOL;
@@ -135,4 +135,3 @@ try {
 }
 
 exit($exitsuccess);
-

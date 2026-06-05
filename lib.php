@@ -31,11 +31,15 @@
  * @param context $context The context of the course
  */
 function report_ldapaccounts_extend_settings_navigation(settings_navigation $navigation, context $context) {
-    global $CFG, $OUTPUT;
     if (has_capability('report/ldapaccounts:view', $context)) {
         $url = new moodle_url('/report/ldapaccounts/index.php');
-        $navigation->add(get_string('pluginname', 'report_ldapaccounts'), $url, navigation_node::TYPE_SETTING,
-            null, null, new pix_icon('i/report', '', 'report_ldapaccounts'));
+        $navigation->add(
+            get_string('pluginname', 'report_ldapaccounts'),
+            $url,
+            navigation_node::TYPE_SETTING,
+            null,
+            null,
+            new pix_icon('i/report', '', 'report_ldapaccounts')
+        );
     }
 }
-

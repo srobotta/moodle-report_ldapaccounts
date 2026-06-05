@@ -24,7 +24,6 @@ namespace report_ldapaccounts;
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class user_table {
-
     /**
      * @var bool
      */
@@ -232,8 +231,8 @@ class user_table {
             $row[] = (int)$user->deleted === 1 ? '' :
                 '<a href="' . $CFG->httpswwwroot . '/message/notificationpreferences.php?userid='
                     . $user->id . '" target="blank"><i title="' . $label
-                    . '" class="icon fa fa-envelope fa-fw '. ($user->emailstop ? 'btn-secondary' : '')
-                    .'" role="img" aria-label="' . $label . '"></i></a>';
+                    . '" class="icon fa fa-envelope fa-fw ' . ($user->emailstop ? 'btn-secondary' : '')
+                    . '" role="img" aria-label="' . $label . '"></i></a>';
         }
         $this->table->data[] = $row;
         return $this;
@@ -242,7 +241,7 @@ class user_table {
     /**
      * Enable the table header with column names.
      * @param bool $val
-     * @return $this
+     * @return self
      * @throws \coding_exception
      */
     public function enable_header(bool $val): user_table {
@@ -268,11 +267,23 @@ class user_table {
                 $totalheadertitles[] = 'ID';
             } else if ($col === 'ldap_status') {
                 $totalheadertitles[] = get_string('form_col_ldap_status', 'report_ldapaccounts');
-            } else if (\in_array($col, [
-                      'auth', 'policyagreed', 'mnethostid', 'lang', 'calendartype', 'currentlogin',
-                      'descriptionformat', 'mailformat', 'maildigest', 'maildisplay', 'timemodified', 'trustbitmask',
-                      'moodlenetprofile',
-            ])) {
+            } else if (
+                \in_array($col, [
+                    'auth',
+                    'policyagreed',
+                    'mnethostid',
+                    'lang',
+                    'calendartype',
+                    'currentlogin',
+                    'descriptionformat',
+                    'mailformat',
+                    'maildigest',
+                    'maildisplay',
+                    'timemodified',
+                    'trustbitmask',
+                    'moodlenetprofile',
+                ])
+            ) {
                 $totalheadertitles[] = get_string('col_' . $col, 'report_ldapaccounts');
             } else {
                 $totalheadertitles[] = get_string($col, 'core');

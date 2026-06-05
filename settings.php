@@ -25,8 +25,15 @@
 defined('MOODLE_INTERNAL') || die;
 
 // Just a link to course report.
-$ADMIN->add('reports', new admin_externalpage('reportldapaccounts', get_string('pluginname', 'report_ldapaccounts'),
-        "$CFG->wwwroot/report/ldapaccounts/index.php", 'report/ldapaccounts:view'));
+$ADMIN->add(
+    'reports',
+    new admin_externalpage(
+        'reportldapaccounts',
+        get_string('pluginname', 'report_ldapaccounts'),
+        "$CFG->wwwroot/report/ldapaccounts/index.php",
+        'report/ldapaccounts:view'
+    )
+);
 
 $settings = new admin_settingpage(
     'report_ldapaccounts_settings',
@@ -36,5 +43,3 @@ $settings = new admin_settingpage(
 if ($ADMIN->fulltree) {
     \report_ldapaccounts\config::get_instance()->add_config_to_settings_page($settings);
 }
-
-

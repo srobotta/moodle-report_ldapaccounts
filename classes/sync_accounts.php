@@ -67,7 +67,7 @@ class sync_accounts {
     /**
      * Get the field name in LDAP where the sso user is stored.
      * Default is the setting report_ldapaccounts | ldapusernamefield
-     * 
+     *
      * @return string
      */
     public function get_username_field(): string {
@@ -123,6 +123,7 @@ class sync_accounts {
     /**
      * Get last sync time. If it was not set, the setting from
      * report_ldapaccounts | lastsyncrun is used.
+     * @return int
      */
     public function get_lastsync(): int {
         if ($this->lastsync === null) {
@@ -133,8 +134,9 @@ class sync_accounts {
 
     /**
      * Set authentication method when an account is created in Moodle.
-     * @var string $authmethod
+     * @param string $authmethod Authentication method name.
      * @return self
+     * @throws \moodle_exception
      */
     public function set_authmethod(string $authmethod): self {
         $authmethods = config::get_instance()->get_available_auth_methods();
@@ -159,7 +161,7 @@ class sync_accounts {
 
     /**
      * Run the sync.
-     * 
+     *
      * @param bool $dryrun
      * @return self
      */

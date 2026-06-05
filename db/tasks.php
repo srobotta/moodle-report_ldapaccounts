@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Config for account sync task.
+ *
+ * @package    report_ldapaccounts
+ * @copyright  2026 Stephan Robotta <stephan.robotta@bfh.ch>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 $tasks = [
@@ -21,7 +29,7 @@ $tasks = [
         'classname' => 'report_ldapaccounts\\task\\sync_ldap_accounts',
         'blocking' => 0,
         'minute' => '15',
-        'hour' => '*',
+        'hour' => '2',
         'day' => '*/1',
         'dayofweek' => '*',
         'month' => '*',

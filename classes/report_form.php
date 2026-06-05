@@ -28,7 +28,6 @@ require_once($CFG->libdir . '/formslib.php');
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class report_form extends \moodleform {
-
     /**
      * List of authentication method values that can be selected from.
      * @var array
@@ -47,7 +46,7 @@ class report_form extends \moodleform {
     protected function definition() {
         $this->_form->addElement(
             'html',
-            '<h4>' . get_string('form_filter_userdata', 'report_ldapaccounts'). '</h4>'
+            '<h4>' . get_string('form_filter_userdata', 'report_ldapaccounts') . '</h4>'
         );
         if (count($this->get_auth_methods()) > 2) {
             $this->_form->addElement(
@@ -69,7 +68,7 @@ class report_form extends \moodleform {
         $this->_form->setType('filter_email', PARAM_RAW_TRIMMED);
         $this->add_any_no_yes('filter_ldapstatus');
 
-        $this->_form->addElement('html', '<h4>' . $this->s('form_show_userdata'). '</h4>');
+        $this->_form->addElement('html', '<h4>' . $this->s('form_show_userdata') . '</h4>');
 
         // Build here the multi select element for the cols to show.
         $cols = user_query::get_possible_fields();
@@ -79,12 +78,11 @@ class report_form extends \moodleform {
         foreach (\array_keys($cols) as $col) {
             $cols[$col] = $col;
         }
-        $this->_form->addElement('select', 'show_cols', $this->s('form_show_cols'),
-            $cols, ['size' => 7, 'multiple' => true])
+        $this->_form->addElement('select', 'show_cols', $this->s('form_show_cols'), $cols, ['size' => 7, 'multiple' => true])
             ->setValue('id,ldap_status,email,username,firstname,lastname,lastlogin');
 
         $this->_form->addElement('checkbox', 'download_csv', $this->s('form_download_csv'));
-        $this->_form->addElement('select', 'csv_delimiter',  $this->s('form_csv_delimiter'), self::$csvdelimiters);
+        $this->_form->addElement('select', 'csv_delimiter', $this->s('form_csv_delimiter'), self::$csvdelimiters);
 
         $this->_form->addElement('submit', 'submitbutton', $this->s('callreport'));
     }
@@ -143,7 +141,9 @@ class report_form extends \moodleform {
                 } catch (\InvalidArgumentException $e) {
                     $errorfield = explode(' ', $e->getMessage())[1];
                     if ($errorfield !== 'ldap_status') {
-                        $errors[$key] = str_replace('{0}', $errorfield,
+                        $errors[$key] = str_replace(
+                            '{0}',
+                            $errorfield,
                             get_string('form_error_column', 'report_ldapaccounts')
                         );
                     }
@@ -270,7 +270,7 @@ class report_form extends \moodleform {
                 continue;
             }
             $key = str_replace('filter_', '', $property);
-            if (\in_array($key,  ['auth', 'deleted', 'suspended', 'emailstop', 'ldapstatus'])) {
+            if (\in_array($key, ['auth', 'deleted', 'suspended', 'emailstop', 'ldapstatus'])) {
                 $value = (int)$value;
                 if ($value === -1) {
                     continue;
@@ -309,7 +309,7 @@ class report_form extends \moodleform {
                 if ($idx > -1) {
                     $this->_form->getElement('filter_auth')->setValue($idx);
                 }
-            } else if (\in_array($key,  ['deleted', 'suspended', 'emailstop', 'firstname', 'lastname', 'email'])) {
+            } else if (\in_array($key, ['deleted', 'suspended', 'emailstop', 'firstname', 'lastname', 'email'])) {
                 $this->_form->getElement('filter_' . $key)->setValue($value);
             } else if ($key === 'show_cols') {
                 $this->_form->getElement('show_cols')->setValue($value);

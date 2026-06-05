@@ -57,7 +57,7 @@ $exitinvalidaction = 4;
 $exiterrorldap = 5;
 
 // Now get cli options that are set by the caller.
-list($options, $unrecognized) = cli_get_params($longparams, $shortparams);
+[$options, $unrecognized] = cli_get_params($longparams, $shortparams);
 
 $verbose = empty($options['silent']);
 
@@ -220,8 +220,8 @@ while (1) {
     $query->set_next_page();
     if (!empty($idstoupdate) && !empty($action)) {
         $sql = 'UPDATE {user} '
-            . ' SET '. $action . ' = 1, timemodified = ' . time()
-            . ' WHERE id IN ( ' . implode(',', $idstoupdate). ')';
+            . ' SET ' . $action . ' = 1, timemodified = ' . time()
+            . ' WHERE id IN ( ' . implode(',', $idstoupdate) . ')';
         $DB->execute($sql);
     }
 }
@@ -230,6 +230,4 @@ if ($verbose) {
 }
 $ldap->close();
 
-
 exit($exitsuccess);
-

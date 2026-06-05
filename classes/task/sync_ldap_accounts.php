@@ -44,5 +44,4 @@ class sync_ldap_accounts extends \core\task\scheduled_task {
         $sync = new sync_accounts();
         $sync->exec();
     }
-
 }
