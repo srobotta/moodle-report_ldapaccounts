@@ -24,11 +24,10 @@
 
 use report_ldapaccounts\config;
 use report_ldapaccounts\sync_accounts;
-use report_ldapaccounts\user_query;
 
 define('CLI_SCRIPT', true);
 
-require(__DIR__ . '/../../../config.php');
+require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/clilib.php');
 
 // Define the input options.
@@ -37,6 +36,7 @@ $longparams = [
     'date' => '',
     'dryrun' => false,
     'help' => false,
+    'ldapmail' => '',
     'ldapquery' => '',
     'silent' => false,
     'username' => '',
@@ -46,6 +46,7 @@ $shortparams = [
     'a' => 'authmethod',
     'd' => 'date',
     'h' => 'help',
+    'm' => 'ldapmail',
     'n' => 'dryrun',
     'q' => 'ldapquery',
     's' => 'silent',
@@ -84,6 +85,8 @@ Options:
 -d, --date       Date (must be parseable date string) where to start from in LDAP
                  to search for newer accounts.
 -h, --help       Print out this help.
+-m, --ldapmail   The ldap mail field where to look up emails. If not set
+                 the setting \"report_ldapaccounts | ldapmailfield\" is used.
 -n, --dryrun     Do not create users.
 -q, --ldapquery  Query prefix that is prepend to all LDAP queries. If not
                  set the setting \"report_ldapaccounts | ldapquery\" is used.
@@ -100,10 +103,11 @@ Example:
     exit($exitsuccess);
 }
 
-$authmethod = $options['authmethod'] ?? config::get_instance()->get_setting('syncauthmethod');
-$ldapssofield = $options['username'] ?? config::get_instance()->get_setting('ldapusernamefield');
-$ldapquery = $options['ldapquery'] ?? config::get_instance()->get_setting('ldapquery');
-$date = $options['date'] ?? config::get_instance()->get_last_sync_time();
+$authmethod = $options['authmethod'] ?: config::get_instance()->get_setting('syncauthmethod');
+$usernamefield = $options['username'] ?: config::get_instance()->get_setting('ldapusernamefield');
+$mailfield = $options['ldapmail'] ?: config::get_instance()->get_setting('ldapmailfield');
+$ldapquery = $options['ldapquery'] ?: config::get_instance()->get_setting('ldapquery');
+$date = $options['date'] ?: config::get_instance()->get_last_sync_time();
 
 if (!$dryrun && !config::get_instance()->is_valid_auth_method($authmethod)) {
     if ($verbose) {
@@ -118,6 +122,8 @@ try {
     }
     $sync = new sync_accounts();
     $sync->set_queryprefix($ldapquery)
+        ->set_username_field($usernamefield)
+        ->set_mail_field($mailfield)
         ->set_authmethod($authmethod)
         ->set_lastsync($date)
         ->exec($dryrun);

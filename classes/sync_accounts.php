@@ -37,6 +37,12 @@ class sync_accounts {
     private $usernamefield;
 
     /**
+     * The ldap field name for the email address.
+     * @var string
+     */
+    private $mailfield;
+
+    /**
      * The query prefix for LDAP to select the correct records.
      * @var string
      */
@@ -75,6 +81,30 @@ class sync_accounts {
             return (string)config::get_instance()->get_setting('ldapusernamefield');
         }
         return $this->usernamefield;
+    }
+
+    /**
+     * Set the field name in LDAP where the email of the user is stored.
+     *
+     * @param string $field
+     * @return self
+     */
+    public function set_mail_field(string $field): self {
+        $this->mailfield = $field;
+        return $this;
+    }
+
+    /**
+     * Get the field name in LDAP where the email of the user is stored.
+     * Default is the setting report_ldapaccounts | ldapmailfield
+     *
+     * @return string
+     */
+    public function get_mail_field(): string {
+        if ($this->mailfield === null) {
+            return (string)config::get_instance()->get_setting('ldapmailfield');
+        }
+        return $this->mailfield;
     }
 
     /**
@@ -178,7 +208,8 @@ class sync_accounts {
         if (empty($authmethod)) {
             throw new \moodle_exception('Setting report_ldapaccounts | syncauthmethod must not be empty.');
         }
-        $resultfields = [$usernamefield, 'mail', 'givenname', 'sn'];
+        $mailfield = $this->get_mail_field();
+        $resultfields = [$usernamefield, $mailfield, 'givenname', 'sn'];
 
         $ldap = ldap::init_from_config();
         try {
@@ -200,7 +231,7 @@ class sync_accounts {
 
             $user = (object)[
                 'username' => $username,
-                'email' => trim((string)($ldapuser['mail'] ?? '')),
+                'email' => trim((string)($ldapuser[$mailfield] ?? '')),
                 'firstname' => trim((string)($ldapuser['givenname'] ?? '')),
                 'lastname' => trim((string)($ldapuser['sn'] ?? '')),
                 'auth' => $authmethod,
