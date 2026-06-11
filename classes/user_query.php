@@ -16,6 +16,8 @@
 
 namespace report_ldapaccounts;
 
+use core_user\fields;
+
 /**
  * Encapsulates selecting users from the database, and handles chunks of data to prevent fetching all data at once.
  *
@@ -67,13 +69,19 @@ class user_query {
     private $recordcnt;
 
     /**
+     * Cached information for custom field SQL construction.
+     * @var array|null
+     */
+    private $fieldsql = null;
+
+    /**
      * Constructor to setup the query.
      *
      * @param array|null $fields
      * @param array|null $filter
      * @param int|null $size
      */
-    public function __construct(array $fields = null, array $filter = null, int $size = null) {
+    public function __construct(?array $fields = null, ?array $filter = null, ?int $size = null) {
         if (is_array($fields)) {
             $this->set_selected_fields($fields);
         }
@@ -167,12 +175,12 @@ class user_query {
     }
 
     /**
-     * Validate field names that they exist in the user table.
+     * Validate field names that they exist in the user table or are valid profile fields.
      * @param array $fields
      * @return void
      */
     public function validate_fields(array $fields): void {
-        $cols = \array_flip(self::get_possible_fields());
+        $cols = \array_flip(self::get_possible_fields(true));
         foreach ($fields as $field) {
             if (!isset($cols[$field])) {
                 throw new \InvalidArgumentException('Field ' . $field . ' does not exist in user table');
@@ -181,11 +189,13 @@ class user_query {
     }
 
     /**
-     * Get column information for user table. Valid column are reduced by security related values.
+     * Get column information for user table. Valid columns are reduced by security related values.
+     * If requested, include custom profile user fields as well.
+     * @param bool $includeprofilefields
      * @return array
      */
-    public static function get_possible_fields(): array {
-        global $DB;
+    public static function get_possible_fields(bool $includeprofilefields = false): array {
+        global $CFG, $DB;
         static $cols;
 
         if ($cols === null) {
@@ -196,7 +206,14 @@ class user_query {
             unset($cols['password'], $cols['secret']);
             $cols = \array_flip($cols);
         }
-        return $cols;
+
+        if (!$includeprofilefields) {
+            return $cols;
+        }
+
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+        $profilefields = get_profile_field_names();
+        return array_merge($cols, $profilefields);
     }
 
     /**
@@ -254,6 +271,43 @@ class user_query {
     }
 
     /**
+     * Get the list of fields required for the SQL query, including fields used only in filters.
+     * @return array
+     */
+    protected function get_query_fields(): array {
+        $fields = $this->selectedfields;
+        foreach (\array_keys($this->filter) as $field) {
+            if (!\in_array($field, $fields, true)) {
+                $fields[] = $field;
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * Build the SQL pieces for the given fields.
+     * @param array $fields
+     * @return \stdClass{
+     *     selects:string,
+     *     joins:string,
+     *     params:array,
+     *     mappings:array,
+     * }
+     */
+    protected function get_field_sql_parts(array $fields): \stdClass {
+        static $cache = [];
+        $fields = \array_values(\array_unique($fields));
+        if (empty($fields)) {
+            return (object)['selects' => '', 'joins' => '', 'params' => [], 'mappings' => []];
+        }
+        $key = json_encode($fields);
+        if (!\array_key_exists($key, $cache)) {
+            $cache[$key] = fields::empty()->including(...$fields)->get_sql('u', true, '', '', false);
+        }
+        return $cache[$key];
+    }
+
+    /**
      * Get parameterized where clause. Also build up the argument values array with the concrete values
      * that are supposed to be used in the query.
      * @return string
@@ -264,17 +318,19 @@ class user_query {
             $this->where = '1=1';
             $this->args = [];
             if (!empty($this->filter)) {
+                $fieldsqlparts = $this->get_field_sql_parts($this->get_query_fields());
                 foreach ($this->filter as $col => $val) {
                     $this->where .= ' AND ';
-                    if (is_array($val)) {
+                    $sqlfield = $fieldsqlparts->mappings[$col] ?? 'u.' . $col;
+                    if (\is_array($val)) {
                         if (strtolower($val[1]) === 'like') {
-                            $this->where .= $DB->sql_like($col, ' :' . $col, false, false);
+                            $this->where .= $DB->sql_like($sqlfield, ' :' . $col, false, false);
                         } else {
-                            $this->where .= $col . $val[1] . ' :' . $col . ' ';
+                            $this->where .= $sqlfield . $val[1] . ' :' . $col . ' ';
                         }
                         $this->args[$col] = $val[0];
                     } else {
-                        $this->where .= $col . '= :' . $col . ' ';
+                        $this->where .= $sqlfield . '= :' . $col . ' ';
                         $this->args[$col] = $val;
                     }
                 }
@@ -290,22 +346,28 @@ class user_query {
      */
     public function get_users(): array {
         global $DB;
+        $fields = $this->selectedfields;
+        if (!\in_array('id', $fields, true)) {
+            array_unshift($fields, 'id');
+        }
+        $queryfields = $this->get_query_fields();
+        $joinparts = $this->get_field_sql_parts($queryfields);
+        $selectparts = $this->get_field_sql_parts($fields);
+
+        $params = \array_merge($this->get_args(), $joinparts->params);
+
         if ($this->recordcnt === null) {
-            $this->recordcnt = $DB->count_records_select('user', $this->get_where(), $this->get_args());
+            $countsql = 'SELECT COUNT(DISTINCT u.id) FROM {user} u ' . $joinparts->joins . ' WHERE ' . $this->get_where();
+            $this->recordcnt = $DB->count_records_sql($countsql, $params);
         }
-        if (empty($this->selectedfields)) {
-            $cols = ',';
-        } else if (!\in_array('id', $this->selectedfields)) {
-            $cols = 'id,' . implode(', ', $this->selectedfields);
-        } else {
-            $cols = implode(', ', $this->selectedfields);
-        }
-        $sql = 'SELECT ' . $cols . ' FROM {user} WHERE ' . $this->get_where()
-            . ' ORDER BY id';
+
+        $cols = ltrim($selectparts->selects, ', ');
+        $sql = 'SELECT ' . $cols . ' FROM {user} u ' . $joinparts->joins . ' WHERE ' . $this->get_where()
+            . ' ORDER BY u.id';
         if ($this->size > 0) {
-            $users = $DB->get_records_sql($sql, $this->get_args(), ($this->page - 1) * $this->size, $this->size);
+            $users = $DB->get_records_sql($sql, $params, ($this->page - 1) * $this->size, $this->size);
         } else {
-            $users = $DB->get_records_sql($sql, $this->get_args());
+            $users = $DB->get_records_sql($sql, $params);
         }
         return $users;
     }

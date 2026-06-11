@@ -52,6 +52,7 @@ $string['form_filter_lastname'] = 'Lastname';
 $string['form_filter_ldapstatus'] = 'LDAP Status';
 $string['form_filter_suspended'] = 'Suspended';
 $string['form_filter_userdata'] = 'Filter user data';
+$string['form_filter_userprofilefields'] = 'Filter user profile fields';
 $string['form_show_cols'] = 'Columns';
 $string['form_show_userdata'] = 'Display user data';
 $string['ldapaccounts:view'] = 'View accounts in LDAP';

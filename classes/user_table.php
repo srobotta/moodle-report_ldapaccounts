@@ -16,6 +16,8 @@
 
 namespace report_ldapaccounts;
 
+use core_user\fields;
+
 /**
  * Defines user_table class to display user list at the report page.
  *
@@ -267,6 +269,8 @@ class user_table {
                 $totalheadertitles[] = 'ID';
             } else if ($col === 'ldap_status') {
                 $totalheadertitles[] = get_string('form_col_ldap_status', 'report_ldapaccounts');
+            } else if (fields::match_custom_field($col) !== '') {
+                $totalheadertitles[] = fields::get_display_name($col);
             } else if (
                 \in_array($col, [
                     'auth',

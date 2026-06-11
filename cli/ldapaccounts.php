@@ -97,7 +97,7 @@ Options:
                  filter argument for the above should
                  look like this: {\"deleted\":0,\"email\":\"*example.org\"}
                  Fields that can be used are all columns inside the user
-                 table.
+                 table or custom profile fields using the profile_field_ prefix.
 -h, --help       Print out this help
 -m, --ldapmail   The ldap mail field where to look up emails. If not set
                  the setting \"report_ldapaccounts | ldapmailfield\" is used.

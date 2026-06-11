@@ -44,10 +44,7 @@ class report_form extends \moodleform {
      * Define the form.
      */
     protected function definition() {
-        $this->_form->addElement(
-            'html',
-            '<h4>' . get_string('form_filter_userdata', 'report_ldapaccounts') . '</h4>'
-        );
+        $this->_form->addElement('html', '<h4>' . $this->s('form_filter_userdata') . '</h4>');
         if (count($this->get_auth_methods()) > 2) {
             $this->_form->addElement(
                 'select',
@@ -68,16 +65,27 @@ class report_form extends \moodleform {
         $this->_form->setType('filter_email', PARAM_RAW_TRIMMED);
         $this->add_any_no_yes('filter_ldapstatus');
 
-        $this->_form->addElement('html', '<h4>' . $this->s('form_show_userdata') . '</h4>');
 
         // Build here the multi select element for the cols to show.
+        global $CFG;
         $cols = user_query::get_possible_fields();
         // Insert the ldap_status field after id.
         array_splice($cols, array_search('id', $cols) + 1, 0, ['ldap_status']);
-        $cols = \array_flip($cols);
-        foreach (\array_keys($cols) as $col) {
-            $cols[$col] = $col;
+        $cols = array_combine($cols, $cols);
+
+        // Include custom profile fields if there are any.
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+        foreach (get_profile_field_list() as $profilefields) {
+            $this->_form->addElement(
+                'html', '<h4>' . $this->s('form_filter_userprofilefields') . '</h4>');
+            foreach ($profilefields as $fieldname => $fieldlabel) {
+                $this->_form->addElement('text', $fieldname, $fieldlabel);
+                $this->_form->setType($fieldname, PARAM_RAW_TRIMMED);
+                $cols[$fieldname] = $fieldlabel;
+            }
         }
+
+        $this->_form->addElement('html', '<h4>' . $this->s('form_show_userdata') . '</h4>');
         $this->_form->addElement('select', 'show_cols', $this->s('form_show_cols'), $cols, ['size' => 7, 'multiple' => true])
             ->setValue('id,ldap_status,email,username,firstname,lastname,lastlogin');
 
@@ -181,30 +189,32 @@ class report_form extends \moodleform {
         if (!$this->is_submitted()) {
             return json_encode($filter);
         }
-        $data = $this->get_data();
-        if (isset($data->filter_auth) && $data->filter_auth > -1) {
-            $val = $this->get_auth_methods()[(int)$data->filter_auth] ?: '';
-            if (!empty($val)) {
-                $filter['auth'] = $val;
+        $data = (array)$this->get_data();
+        foreach ($data as $key => $value) {
+            // Remove filter prefix Skip all fields that are not filters.
+            if (str_starts_with($key, 'filter_')) {
+                $key = substr($key, 7);
+            } else if (!str_starts_with($key, 'profile_field_')) {
+                continue;
             }
-        }
-        if (isset($data->filter_deleted) && $data->filter_deleted > -1) {
-            $filter['deleted'] = (int)$data->filter_deleted;
-        }
-        if (isset($data->filter_suspended) && $data->filter_suspended > -1) {
-            $filter['suspended'] = (int)$data->filter_suspended;
-        }
-        if (isset($data->filter_emailstop) && $data->filter_emailstop > -1) {
-            $filter['emailstop'] = (int)$data->filter_emailstop;
-        }
-        if (isset($data->filter_firstname) && !empty(trim($data->filter_firstname))) {
-            $filter['firstname'] = trim($data->filter_firstname) . '*';
-        }
-        if (isset($data->filter_lastname) && !empty(trim($data->filter_lastname))) {
-            $filter['lastname'] = trim($data->filter_lastname) . '*';
-        }
-        if (isset($data->filter_email) && !empty(trim($data->filter_email))) {
-            $filter['email'] = trim($data->filter_email) . '*';
+            if (\in_array($key, ['deleted', 'suspended', 'emailstop', 'ldapstatus'])) {
+                $value = (int)$value;
+                if ($value > -1) {
+                    $filter[$key] = $value;
+                }
+                continue;
+            }
+            if ($key === 'auth') {
+                $value = $this->get_auth_methods()[(int)$value] ?: '';
+                if (!empty($value)) {
+                    $filter['auth'] = $value;
+                }
+                continue;
+            }
+            $value = trim($value);
+            if (!empty($value)) {
+                $filter[$key] = $value . '*';
+            }
         }
         return json_encode($filter);
     }
@@ -228,14 +238,10 @@ class report_form extends \moodleform {
     public function get_submitted_select_fields(): array {
         $cols = array_filter(
             array_map(
-                function ($i) {
-                    return trim($i);
-                },
+                fn($i) => is_string($i) ? trim($i) : $i,
                 $this->get_submitted_data()->show_cols ?? []
             ),
-            function ($i) {
-                return !empty($i);
-            }
+            fn($i) => !empty($i)
         );
         return $cols;
     }
