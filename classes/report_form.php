@@ -193,7 +193,7 @@ class report_form extends \moodleform {
             } else if (!str_starts_with($key, 'profile_field_')) {
                 continue;
             }
-            if (\in_array($key, ['deleted', 'suspended', 'emailstop', 'ldapstatus'])) {
+            if (\in_array($key, ['deleted', 'suspended', 'emailstop', 'ldapstatus', 'auth'])) {
                 $value = (int)$value;
                 if ($value > -1) {
                     $filter[$key] = $value;

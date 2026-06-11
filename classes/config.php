@@ -264,4 +264,39 @@ class config {
             }
         }
     }
+
+    /**
+     * Check whether the sync task can run.
+     * Returned results are:
+     * 0: all good
+     * 1: setting report_ldapaccounts | ldapusernamefield is empty
+     * 2: server connection is missing (partially)
+     * 3: cannot connect to server / execute query
+     * 4: field in report_ldapaccounts | ldapusernamefield seems not to exist in ldap tree.
+     * @return int
+     */
+    public function can_i_sync(): int {
+        $ldapusernamefield = $this->get_setting('ldapusernamefield');
+        if (empty($ldapusernamefield)) {
+            return 1;
+        }
+        foreach (['server', 'user', 'pass'] as $key) {
+            if (empty($this->get_setting($key))) {
+                return 2;
+            }
+        }
+        try {
+            $ldap = ldap::init_from_config();
+            $cnt = $ldap->search([$ldapusernamefield => '*'], ['cn'], null, 10)->get_count();
+        } catch (\Exception $e) {
+            // We limited the search above to 10. However, when there are more results than
+            // 10, still an exception is thrown. In this case we must check for this false positive.
+            if (str_contains($e->getMessage(), 'Sizelimit exceeded')) {
+                return 0;
+            }
+            return 3;
+        }
+        // When the query did not return any results, the field in the query seems to be wrong.
+        return $cnt === 0 ? 4 : 0;
+    }
 }

@@ -16,6 +16,7 @@
 
 namespace report_ldapaccounts\task;
 
+use report_ldapaccounts\config;
 use report_ldapaccounts\sync_accounts;
 
 /**
@@ -41,7 +42,12 @@ class sync_ldap_accounts extends \core\task\scheduled_task {
      * @return void
      */
     public function execute(): void {
-        $sync = new sync_accounts();
-        $sync->exec();
+        $res = @config::get_instance()->can_i_sync();
+        if ($res === 0) {
+            $sync = new sync_accounts();
+            $sync->exec();
+        } else {
+            echo get_string('synccheck_' . $res, 'report_ldapaccounts') . PHP_EOL;
+        }
     }
 }

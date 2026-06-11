@@ -57,6 +57,7 @@ $shortparams = [
 $exitsuccess = 0;
 $exitunknownoption = 1;
 $exitauthmethoddisabled = 2;
+$exitsynccheckfailed = 3;
 $exiterrorldap = 5;
 
 // Now get cli options that are set by the caller.
@@ -114,6 +115,14 @@ if (!$dryrun && !config::get_instance()->is_valid_auth_method($authmethod)) {
         cli_error(get_string('authmethoddisabled', 'report_ldapaccounts', $authmethod), $exitunknownoption);
     }
     exit($exitauthmethoddisabled);
+}
+
+$synccheck = @config::get_instance()->can_i_sync();
+if ($synccheck !== 0) {
+    if ($verbose) {
+        cli_error(get_string('synccheck_' . $synccheck, 'report_ldapaccounts'));
+    }
+    exit($exitsynccheckfailed);
 }
 
 try {

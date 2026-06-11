@@ -105,7 +105,7 @@ class ldap {
      * @param int|null $port
      * @return void
      */
-    public function __construct(string $server, string $basedn, string $username, string $password = null, int $port = null) {
+    public function __construct(string $server, string $basedn, string $username, ?string $password = null, ?int $port = null) {
         $this->server = strpos($server, '://') === false ? 'ldaps://' . $server : $server;
         $this->basedn = $basedn;
         $this->username = $username;
@@ -276,12 +276,13 @@ class ldap {
      * @param array|string $searchfields
      * @param array|string|null $resultfields
      * @param string|null $fixedquerypart
+     * @param int|null $size
      * @return ldap
      */
-    public function search($searchfields, $resultfields = null, ?string $fixedquerypart = null): ldap {
+    public function search($searchfields, $resultfields = null, ?string $fixedquerypart = null, int $size = -1): ldap {
         $filter = $fixedquerypart . $this->get_filter($searchfields);
         $justthese = $this->get_result_fields($resultfields);
-        $search = ldap_search($this->get_connection(), $this->basedn, $filter, $justthese);
+        $search = ldap_search($this->get_connection(), $this->basedn, $filter, $justthese, 0, $size);
         if (!$search) {
             if (ldap_get_option($this->ldap, LDAP_OPT_DIAGNOSTIC_MESSAGE, $error)) {
                 $this->log($filter, $justthese, 'Error searching LDAP: ' . $error);
