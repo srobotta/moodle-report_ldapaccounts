@@ -65,7 +65,6 @@ class report_form extends \moodleform {
         $this->_form->setType('filter_email', PARAM_RAW_TRIMMED);
         $this->add_any_no_yes('filter_ldapstatus');
 
-
         // Build here the multi select element for the cols to show.
         global $CFG;
         $cols = user_query::get_possible_fields();
@@ -76,8 +75,7 @@ class report_form extends \moodleform {
         // Include custom profile fields if there are any.
         require_once($CFG->dirroot . '/user/profile/lib.php');
         foreach (get_profile_field_list() as $profilefields) {
-            $this->_form->addElement(
-                'html', '<h4>' . $this->s('form_filter_userprofilefields') . '</h4>');
+            $this->_form->addElement('html', '<h4>' . $this->s('form_filter_userprofilefields') . '</h4>');
             foreach ($profilefields as $fieldname => $fieldlabel) {
                 $this->_form->addElement('text', $fieldname, $fieldlabel);
                 $this->_form->setType($fieldname, PARAM_RAW_TRIMMED);
