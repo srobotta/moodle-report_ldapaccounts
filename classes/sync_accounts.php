@@ -253,7 +253,7 @@ class sync_accounts {
 
         if (!$dryrun) {
             $this->lastsync = time();
-            $config->set_last_sync_time($this->lastsync);
+            config::get_instance()->set_last_sync_time($this->lastsync);
         }
         return $this;
     }
