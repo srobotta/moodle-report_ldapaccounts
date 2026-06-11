@@ -167,14 +167,12 @@ class report_form extends \moodleform {
      * @throws \dml_exception
      */
     protected function get_auth_methods(): array {
-        global $DB;
-
         if ($this->authmethods === null) {
             $this->authmethods = [-1 => get_string('any')];
             $i = 0;
-            $res = $DB->get_records_sql('SELECT DISTINCT(auth) FROM {user}');
-            foreach ($res as $row) {
-                $this->authmethods[$i++] = $row->auth;
+            $res = config::get_available_auth_methods();
+            foreach (\array_keys($res) as $row) {
+                $this->authmethods[$i++] = $row;
             }
         }
         return $this->authmethods;

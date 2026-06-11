@@ -170,11 +170,21 @@ class config {
      * @return array
      */
     public static function get_available_auth_methods(): array {
-        $authentication = \core\di::get(\core\authentication::class);
-        $enabledauths = $authentication->get_enabled_plugins();
+        global $CFG, $DB;
+
         $options = [];
-        foreach ($enabledauths as $authname) {
-            $options[$authname] = self::get_auth_display_name($authname);
+        // Newer than any 5.2.x release.
+        if ($CFG->version > 2026042020) {
+            $authentication = \core\di::get(\core\authentication::class);
+            $enabledauths = $authentication->get_enabled_plugins();
+            foreach ($enabledauths as $authname) {
+                $options[$authname] = self::get_auth_display_name($authname);
+            }
+        } else {
+            $res = $DB->get_records_sql('SELECT DISTINCT(auth) FROM {user}');
+            foreach ($res as $row) {
+                $options[$row->auth] = $row->auth;
+            }
         }
         asort($options);
         return $options;
