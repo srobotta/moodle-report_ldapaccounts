@@ -209,7 +209,7 @@ class sync_accounts {
             throw new \moodle_exception('Setting report_ldapaccounts | syncauthmethod must not be empty.');
         }
         $mailfield = $this->get_mail_field();
-        $resultfields = [$usernamefield, $mailfield, 'givenname', 'sn'];
+        $resultfields = [$usernamefield, $mailfield, 'givenname', 'sn', 'preferredlanguage'];
 
         $ldap = ldap::init_from_config();
         try {
@@ -229,6 +229,9 @@ class sync_accounts {
                 continue;
             }
 
+            $context = \context_system::instance();
+            require_capability('moodle/user:create', $context);
+
             $user = (object)[
                 'username' => $username,
                 'email' => trim((string)($ldapuser[$mailfield] ?? '')),
@@ -237,13 +240,27 @@ class sync_accounts {
                 'auth' => $authmethod,
                 'confirmed' => 1,
                 'deleted' => 0,
+                'lang' => trim((string)($ldapuser['preferredlanguage'] ?? '')),
                 'description' => get_string('userdescription', 'report_ldapaccounts', userdate(time())),
                 'descriptionformat' => FORMAT_PLAIN,
             ];
 
             try {
                 if (!$dryrun) {
-                    user_create_user($user, false, false);
+                    $createpassword = !empty($user->createpassword);
+                    unset($user->createpassword);
+                    // Newer than any 5.2.x release.
+                    if ($CFG->version > 2026042020) {
+                        $authplugin = \core\di::get(\core\authentication::class)->get_plugin($authmethod);
+                        $newpassword = !empty($user->newpassword)
+                            ? \core\di::get(\core\authentication\password::class)->hash($user->newpassword)
+                            : '';
+                    } else {
+                        $authplugin = get_auth_plugin($authmethod);
+                        $newpassword = !empty($user->newpassword) ? hash_internal_user_password($usernew->newpassword) : '';
+                    }
+                    unset($user->newpassword);
+                    $user = $this->create_new_user($user, $authplugin, $newpassword);
                 }
                 $this->log[] = 'Create user: ' . json_encode($user);
             } catch (\Exception $e) {
@@ -256,6 +273,68 @@ class sync_accounts {
             config::get_instance()->set_last_sync_time($this->lastsync);
         }
         return $this;
+    }
+
+    /**
+     * Create a new user from the standard class data containing the user data from the LDAP mapping.
+     * @param \stdClass $user
+     * @param object $authplugin
+     * @param string $newpassword (already hashed)
+     * @return \stdClass
+     */
+    protected function create_new_user(\stdClass $user, $authplugin, string $newpassword): \stdClass {
+        global $CFG, $DB;
+        require_once($CFG->dirroot . '/user/editlib.php');
+        require_once($CFG->dirroot . '/user/profile/lib.php');
+
+        $user->mnethostid = $CFG->mnet_localhost_id;
+        if (!isset($user->confirmed)) {
+            $user->confirmed  = 1;
+        }
+        $user->timecreated = time();
+        $createpassword = !empty($user->createpassword);
+        unset($user->createpassword);
+        if ($authplugin->is_internal()) {
+            if ($createpassword || empty($newpassword)) {
+                $user->password = '';
+            } else {
+                $user->password = $newpassword;
+            }
+        } else {
+            $user->password = AUTH_PASSWORD_NOT_CACHED;
+        }
+        $user->id = user_create_user($user, false, false);
+        if (!$authplugin->is_internal() && $authplugin->can_change_password() && !empty($newpassword)) {
+            if (!$authplugin->user_update_password($user, $newpassword)) {
+                // Do not stop here, we need to finish user creation.
+                debugging(get_string('cannotupdatepasswordonextauth', 'error', $user->auth), DEBUG_NONE);
+            }
+        }
+        $usercontext = \context_user::instance($user->id);
+
+        // Update preferences.
+        useredit_update_user_preference($user);
+
+        // Update tags.
+        if (isset($user->interests)) {
+            useredit_update_interests($user, $user->interests);
+        }
+
+        // Save custom profile fields data.
+        profile_save_data($user);
+
+        // Reload from db.
+        $usernew = $DB->get_record('user', ['id' => $user->id]);
+
+        if ($createpassword) {
+            setnew_password_and_mail($usernew);
+            unset_user_preference('create_password', $usernew);
+            set_user_preference('auth_forcepasswordchange', 1, $usernew);
+        }
+
+        // Trigger create event, after all fields are stored.
+        \core\event\user_created::create_from_userid($usernew->id)->trigger();
+        return $usernew;
     }
 
     /**

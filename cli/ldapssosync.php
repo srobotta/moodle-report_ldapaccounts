@@ -104,6 +104,10 @@ Example:
     exit($exitsuccess);
 }
 
+// Set user to site admin for permission checks and to avoid issues with user create.
+$admin = get_admin();
+\core\session\manager::set_user($admin);
+
 $authmethod = $options['authmethod'] ?: config::get_instance()->get_setting('syncauthmethod');
 $usernamefield = $options['username'] ?: config::get_instance()->get_setting('ldapusernamefield');
 $mailfield = $options['ldapmail'] ?: config::get_instance()->get_setting('ldapmailfield');

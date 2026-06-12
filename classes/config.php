@@ -82,7 +82,7 @@ class config {
 
         // Directory where to store the csv files.
         $dir = $CFG->tempdir . DIRECTORY_SEPARATOR . 'report_ldapaccounts';
-        if (!is_dir($dir) && !mkdir($dir, $CFG->directorypermissions)) {
+        if (!is_dir($dir) && !@mkdir($dir, $CFG->directorypermissions)) {
             throw new \RuntimeException('could not create temp directory for plugin user files');
         }
         return $dir;
