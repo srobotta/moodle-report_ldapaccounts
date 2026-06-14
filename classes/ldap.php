@@ -260,7 +260,7 @@ class ldap {
             return;
         }
         foreach ($data as $key => $row) {
-            fputcsv($fp, [$time, $uniqid, $remoteip, $USER->id, $key, $row], ';');
+            fputcsv($fp, [$time, $uniqid, $remoteip, $USER->id, $key, $row], ';', '"', '\\', "\n");
         }
         fflush($fp);
         flock($fp, LOCK_UN);
