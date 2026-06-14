@@ -112,10 +112,22 @@ final class lib_test extends \advanced_testcase {
         set_config('ldapcacert', '/tmp/ldap-cacert.pem', 'report_ldapaccounts');
         set_config('logging', 1, 'report_ldapaccounts');
 
+        // Reset config singleton.
+        $class = new \ReflectionClass(config::class);
+        $property = $class->getProperty('instance');
+        $property->setValue(null, null);
+
+        // Get the ldap object with the config from above.
         $ldap = ldap::init_from_config();
         $class = new \ReflectionClass($ldap);
         $property = $class->getProperty('logging');
         $this->assertTrue($property->getValue($ldap));
+        $property = $class->getProperty('server');
+        $this->assertEquals('ldaps://example.com', $property->getValue($ldap));
+        $property = $class->getProperty('password');
+        $this->assertEquals('pass', $property->getValue($ldap));
+        $property = $class->getProperty('count');
+        $this->assertSame(0, $property->getValue($ldap));
     }
 
     /**
