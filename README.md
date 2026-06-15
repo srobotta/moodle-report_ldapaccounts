@@ -15,7 +15,9 @@ Another functionality of the plugin is that it provides a cli script. This has t
 functionality like the report page, but can also be used to automatically suspend,
 delete accounts or set the emailstop flag for the user.
 
-## Use case
+## Use cases
+
+### Suspend user
  
 The use case for the need of this plugin was that the Moodle authentication is
 done via [Shibboleth](https://en.wikipedia.org/wiki/Shibboleth_(software))
@@ -32,6 +34,21 @@ sent out to the users email address.
 Therefore, there is a need to detect such users and disable or delete them from Moodle
 once they do not yet exist in the LDAP anymore. The CLI script should automate the
 process e.g. at each start of a new term.
+
+### Create new accout
+
+Another use case where the plugin came in use, is the creation of accounts whenever
+a new user appears in the LDAP. In general, an account is automatically created once
+the new user tries to login via Shibboleth/SSO and there exists no Moodle account yet
+for the user. However, teachers or administration staff cannot enrol a user into a course
+unless the user has not yet tried a login. With the automatic creation of the account
+once the user exists in the LDAP directory (the IDS), the user is automatically created
+and can also enrolled in courses without having him to become active.
+
+The sonchronization of the user accounts is done via a Moodle Task but can also be done
+via a command line script. New users are searched via the peoperty `createTimestamp`, a
+standard field that exists in LDAP. After a run the current time is stored in a Moodle
+plugin setting and the next time only newer created accounts are queried in LDAP.
 
 ## Installation
 
@@ -59,17 +76,36 @@ you find all settings regarding this plugin.
 There is a list of fields with the LDAP prefix that handle the connection to the LDAP
 server. You may also provide certificate files for the connection in case necessary.
 
-The setting "Email field in LDAP" may contain a different field name where the email
-is stored in the LDAP directory. By default, this is `mail`.
+The setting "Email field in LDAP" `report_ldapaccounts | ldapmailfield` may contain a
+different field name where the email is stored in the LDAP directory. By default,
+this is `mail`.
 
-The setting "LDAP Query" may contain some additional LDAP query parameters to select
-an user. Imagine the use case that the LDAP directory contains person and institution
-items, both having an email field. In this setting the query might contain additional
-conditions e.g. `(objectClass=person)` to select the person items only.
+The setting "LDAP Query" `report_ldapaccounts | ldapquery` may contain some additional
+LDAP query parameters to select an user. Imagine the use case that the LDAP directory
+contains person and institution items, both having an email field. In this setting the
+query might contain additional conditions e.g. `(objectClass=person)` to select the
+person items only.
 
-The setting "Enable logging" is to log all the communication between Moodle and the
-LDAP service. This is intended for debug reasons and should not be enabled unless
-necessary (see also notes on Privacy below).
+The setting "Enable logging" `report_ldapaccounts | logging` is to log all the
+communication between Moodle and the LDAP service. This is intended for debug reasons
+and should not be enabled unless necessary (see also notes on Privacy below).
+
+For the user account synchronization there are two settings, "Username / IDM field in LDAP"
+`report_ldapaccounts | ldapusernamefield` which contains the name of the LDAP directory
+where the user is identified and that is used in Moodle for the user name. In our
+specific case this is an identifier that comes from the Shibboleth provider, which and
+which is stored in our LDAP/IDM that returns the privileges to the authentication that
+the user may have. The value of this field is used as the username in Moodle and users
+coming authenticated via the SSO are mapped to that user. If the account doesn't yet
+exist, it would be created on the fly upon the first login.
+
+The setting "Authentication method for synchronized users"
+`report_ldapaccounts | syncauthmethod` contains the method that the user should use
+when logging in to Moodle. Ideally this is an SSO method available in your Moodle.
+
+There is a setting `report_ldapaccounts | lastsyncrun` which is not listed on the
+admin settings page, but which is used to hold the timestamp of the last synchronization.
+The value is a unix timestamp.
 
 ## Privacy
 
@@ -162,17 +198,29 @@ already.
 
 ## CLI
 
-The cli script resides in `report/ldapaccounts/cli/ldapaccounts.php`. Administrators
+There are two cli script that reside in `report/ldapaccounts/cli/`. Administrators
 may run it from the command line occasionally or put it into a cronjob to run it
 periodically.
+
+The script `ldapaccounts.php` exports a list of accounts from Moodle in conjunction
+with the LDAP status depending on the given filter.
 
 The output is always a csv formatted string witten to standard out. You may write
 that into a file using the io redirection arguments.
 
-For a list of commands and possible arguments use
+The cli script `ldapssosync.php` queries the LDAP server for newly created users and
+creates an account in Moodle. There is a switch `-n` to simulate the process without
+actually writing any changes. The created users are written to standard out as a
+json encoded string with the few properties set by the script, when a user is created.
+Also, the time from when to query new accounts in LDAP can be set on the command line
+via the argument `-d`.
+
+For a list of possible arguments use
 the `--help` switch to display it.
 
-### Mode
+### Functionality of `ldapaccounts.php`
+
+#### Modes
 
 There are two modes of the script. The first mode works the same as the report page.
 You select user data. The resulting records are print to standard out.
@@ -188,7 +236,7 @@ chunk of user records is fetched). If a user record should be modified, but may 
 that flag set already that is defined by the action, then this data set is not printed
 out.
 
-### Filters
+#### Filters
 
 Filters are more flexible than in the reports page. You can basically use any
 column that exists in the user table to define some criterion and filter data with
@@ -207,7 +255,7 @@ would use the following filter (including the argument switch):
 -f='{"lastname":"w*","suspended":0,"email":"*example.org"}'
 ```
 
-### Other features
+#### Other features
 
 In case you use a different ldapmail field or add a query part to the ldap query
 these options can be submitted by the arguments `--ldapmail` and `--ldapquery`.
@@ -216,6 +264,51 @@ queries in the cli script and the reports page.
 
 To have no output witten to standard out, the switch `--silent` might be used. This
 apparently makes sense only if you also use the `--action` switch.
+
+### Functionality of `ldapssosync.php`
+
+The cli script does basically the same as the `sync_ldap_accounts` task which is
+listed in the scheduled tasks list as "Sync new accounts from LDAP to add user in Moodle".
+The cli script lets you control the behaviour a bit more and lets you run a simulated
+synchronization.
+
+#### CLI arguments
+
+Without any arguments the synchronization is just done in the same was as the scheduled
+task would do it.
+
+Set `-d` or `--date` with a parsable date time string in PHP. This is the point of time
+from where new accounts in LDAP are looked up.
+
+Set `-n` or `--dryrun` without a value. This simulates the run only, does not create any
+accounts and also does not update the timestamp of the last synchronization.
+
+The SSO field in LDAP can be set via `-m` or `--ldapmail` and the authmethod (the technical
+name e.g. `manual`) can be set via `-a` or `--authmethod`.
+
+### Create new users in Moodle
+
+By default new users are created running the scheduled task or the cli script. The first
+must be disabled, if you not wish to do so, the latter is a manual step anyway and can
+controlled by you whenever you want to do it.
+
+A new user uses the following mappings from LDAP to Moodle:
+
+| LDAP field          | Moodle user table   |  Comment                           |
+|---------------------|---------------------|------------------------------------|
+| `sn`                | `lastname`          | hard coded                         |
+| `givenname`         | `firstname`         | hard coded                         |
+| `mail`              | `email`             | via cli argument or setting        |
+| `preferredlanguage` | `lang`              | hard coded                         |
+| `<fixed>`           | `username`          | must be set via setting or cli arg |
+| n.a.                | `auth`              | must be set via setting or cli arg |
+| n.a.                | `deleted`           | always 0                           |
+| n.a.                | `conirmed`          | always 1                           |
+| n.a.                | `description`       | Via lang string `userdescription`  |
+| n.a.                | `descriptionformat` | hard coded to FORMAT_PLAIN         |
+
+This actually addresses all our needs and works in our environment. If you need
+a more detailed configuration, please do not hesitate to open an issue.
 
 ## Limitations and possible future features
 
@@ -226,7 +319,8 @@ as well. At the moment the functionality of the plugin meets our requirements.
 Possible future changes could be:
 
 - More flexibility in matching users in Moodle and LDAP (the username field could be
-  used for that, too).
+  used for that, too - this is the case for the accout creation but not the original
+  use case suspending users).
 - Use output options of Moodle and not the hard coded csv export.
 - Fetch and display other values from the LDAP server, not only the email field to
   match the users.
@@ -235,6 +329,8 @@ Possible future changes could be:
   more that 30k records within less than a minute, therefore we use the direct way
   to display the data.
 - A command that deletes old CSV files that have been generated before a certain time.
+- A scheduled task that checks users in Moodle and LDAP and automatically suspends
+  users.
 
 ## Version history
 
