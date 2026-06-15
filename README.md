@@ -9,9 +9,9 @@
 This plugin displays a report page and matches user accounts in Moodle with an LDAP
 directory in the organisation. Various filters can be used
 to select users. The report may also be exported. Via a cli script non existent users
-in LDAP may be suspended in Moolde.
+in LDAP may be suspended in Moodle.
 
-In addition the plugins contains a scheduled task and a cli script that checks for
+In addition the plugin contains a scheduled task and a cli script that checks for
 new accounts in LDAP and creates a corresponding user account in Moodle. This is helpful
 when new users should be enroled in courses but haven't yet logged into Moodle and
 have an account created during the login process.
