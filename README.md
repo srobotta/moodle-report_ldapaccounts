@@ -1,19 +1,20 @@
 # Report LDAP User Accounts
 
-![Release](https://img.shields.io/badge/Release-1.2-blue.svg)
-[![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/workflows/Moodle%20Plugin%20CI/badge.svg?branch=master)](https://github.com/srobotta/moodle-report_ldapaccounts/actions?query=workflow%3A%22Moodle+Plugin+CI%22+branch%3Amaster)
-[![PHP Support](https://img.shields.io/badge/php-7.4--8.3-blue)](https://github.com/srobotta/moodle-report_ldapaccounts/actions)
-[![Moodle Support](https://img.shields.io/badge/Moodle-4.1--4.4+-orange)](https://github.com/srobotta/moodle-report_ldapaccounts/actions)
+![Release](https://img.shields.io/badge/Release-1.3-blue.svg)
+[![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml)
+[![Moodle Support](https://img.shields.io/badge/Moodle-4.1+-orange)](https://moodledev.io/general/releases)
 [![License GPL-3.0](https://img.shields.io/github/license/srobotta/moodle-report_ldapaccounts?color=lightgrey)](https://github.com/srobotta/moodle-report_ldapaccounts/blob/master/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/srobotta/moodle-report_ldapaccounts)](https://github.com/srobotta/moodle-report_ldapaccounts/graphs/contributors)
 
 This plugin displays a report page and matches user accounts in Moodle with an LDAP
 directory in the organisation. Various filters can be used
-to select users. The report may also be exported.
+to select users. The report may also be exported. Via a cli script non existent users
+in LDAP may be suspended in Moolde.
 
-Another functionality of the plugin is that it provides a cli script. This has the same
-functionality like the report page, but can also be used to automatically suspend,
-delete accounts or set the emailstop flag for the user.
+In addition the plugins contains a scheduled task and a cli script that checks for
+new accounts in LDAP and creates a corresponding user account in Moodle. This is helpful
+when new users should be enroled in courses but haven't yet logged into Moodle and
+have an account created during the login process.
 
 ## Use cases
 
@@ -31,22 +32,22 @@ Whenever a user drops out of the institution the identity provider will not allo
 log him in anymore. However, the account in Moodle is still active and emails may be
 sent out to the users email address.
 
-Therefore, there is a need to detect such users and disable or delete them from Moodle
-once they do not yet exist in the LDAP anymore. The CLI script should automate the
-process e.g. at each start of a new term.
+Therefore, this plugin contains a mechanism to detect such users and disable or delete
+them from Moodle once they do not exist in the LDAP anymore. The CLI script should
+automate the process e.g. at each start of a new term.
 
 ### Create new accout
 
-Another use case where the plugin came in use, is the creation of accounts whenever
+Another use case where the plugin comes in use, is the creation of accounts whenever
 a new user appears in the LDAP. In general, an account is automatically created once
-the new user tries to login via Shibboleth/SSO and there exists no Moodle account yet
-for the user. However, teachers or administration staff cannot enrol a user into a course
+the new user tries to login via SSO and the user does not yet have an account in Moodle.
+However, teachers or administration staff cannot enrol a user into a course
 unless the user has not yet tried a login. With the automatic creation of the account
 once the user exists in the LDAP directory (the IDS), the user is automatically created
-and can also enrolled in courses without having him to become active.
+and can already enrolled into courses without having him to become active to login.
 
-The sonchronization of the user accounts is done via a Moodle Task but can also be done
-via a command line script. New users are searched via the peoperty `createTimestamp`, a
+The sonchronization of the user accounts is done via a Moodle Scheduled Task but can also be
+done via a command line script. New users are searched via the property `createTimestamp`, a
 standard field that exists in LDAP. After a run the current time is stored in a Moodle
 plugin setting and the next time only newer created accounts are queried in LDAP.
 
@@ -59,10 +60,10 @@ and add the connection data to your LDAP server.
 
 ## User identification between Moodle and LDAP
 
-The user match between Moodle and LDAP is done via email solemnly. At the moment there
+The user match from Moodle in LDAP is done via email solemnly. At the moment there
 is no other property considered to be taken as the user identity. The user data
 is taken from the user table in Moodle. The matching email field in LDAP can be configured
-in the settings of the plugin.
+in the settings of the plugin (`report_ldapaccounts | ldapmailfield`).
 
 When querying the LDAP directory it's only checked whether there is a match or not.
 The email field is the only field that is returned by the LDAP query together with the
@@ -122,6 +123,10 @@ This is:
   data directory of Moodle. In case of the LDAP response it may contain personal
   information from the LDAP entries that are not yet in Moodle and also will not be
   processed any further.
+- New users that come from LDAP and are created in Moodle, have the properties email
+  first- and lastname, a username and the preferred language stored in Moodle. This
+  data however, is passed through the plugin only and standard functionality of Moodle
+  is used to process data.
 
 ### Type of stored data
 
@@ -333,6 +338,14 @@ Possible future changes could be:
   users.
 
 ## Version history
+
+### v1.3
+- Implement [Filter for user-defined fields #7](https://github.com/srobotta/moodle-report_ldapaccounts/issues/7)
+  This allows filtering and displaying data from the user defined fields in the report table.
+- Synchonize new users from LDAP to Moodle by creating a new account in Moodle and using a
+  configurable field as username in Moodle that maps to a field in LDAP.
+- Implementation of some PHP Unit tests to cover at least basic functionality of the plugin.
+- Update the CI to actually test Moodle 4.5 onwards only.
 
 ### v1.2
 
