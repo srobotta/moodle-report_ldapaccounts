@@ -143,7 +143,7 @@ class sync_accounts {
             return $this;
         }
         $time = (int)$time;
-        if ($time <= 0) {
+        if ($time < 0) {
             throw new \moodle_exception('synctimeinvalid', 'report_ldapaccounts');
         }
         $this->lastsync = $time;
@@ -247,8 +247,6 @@ class sync_accounts {
 
             try {
                 if (!$dryrun) {
-                    $createpassword = !empty($user->createpassword);
-                    unset($user->createpassword);
                     // Newer than any 5.2.x release.
                     if ($CFG->version > 2026042020) {
                         $authplugin = \core\di::get(\core\authentication::class)->get_plugin($authmethod);
@@ -310,7 +308,6 @@ class sync_accounts {
                 debugging(get_string('cannotupdatepasswordonextauth', 'error', $user->auth), DEBUG_NONE);
             }
         }
-        $usercontext = \context_user::instance($user->id);
 
         // Update preferences.
         useredit_update_user_preference($user);
@@ -345,11 +342,14 @@ class sync_accounts {
     protected function build_query_for_new_records(): string {
         $lastsync = $this->get_lastsync();
         $fixedquery = $this->get_queryprefix();
-        if ($lastsync <= 0) {
-            return $fixedquery;
+        $querystring = "({$this->get_username_field()}=*)";
+        if (!empty($fixedquery)) {
+            $querystring = "(&{$fixedquery}{$querystring})";
         }
-        $createdfield = 'createTimestamp';
-        return "(&{$fixedquery}({$createdfield}>=" . date('YmdHis', $lastsync) . 'Z))';
+        if ($lastsync > 0) {
+            $querystring = substr($querystring, 0, -1) . '(createTimestamp>=' . date('YmdHis', $lastsync) . 'Z))';
+        }
+        return $querystring;
     }
 
     /**
