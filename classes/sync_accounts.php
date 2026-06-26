@@ -347,7 +347,12 @@ class sync_accounts {
             $querystring = "(&{$fixedquery}{$querystring})";
         }
         if ($lastsync > 0) {
-            $querystring = substr($querystring, 0, -1) . '(createTimestamp>=' . date('YmdHis', $lastsync) . 'Z))';
+            $date = '(createTimestamp>=' . date('YmdHis', $lastsync) . 'Z)';
+            if (str_starts_with($querystring, '(&')) {
+                $querystring = substr($querystring, 0, -1) . $date . ')';
+            } else {
+                $querystring = "(&{$date}{$querystring})";
+            }
         }
         return $querystring;
     }
