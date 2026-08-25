@@ -36,6 +36,7 @@ $longparams = [
     'date' => '',
     'dryrun' => false,
     'help' => false,
+    'ldapdate' => '',
     'ldapmail' => '',
     'ldapquery' => '',
     'silent' => false,
@@ -45,6 +46,7 @@ $longparams = [
 $shortparams = [
     'a' => 'authmethod',
     'd' => 'date',
+    'e' => 'ldapdate',
     'h' => 'help',
     'm' => 'ldapmail',
     'n' => 'dryrun',
@@ -85,6 +87,8 @@ Options:
                  the setting report_ldapaccounts | syncauthmethod is used.
 -d, --date       Date (must be parseable date string) where to start from in LDAP
                  to search for newer accounts.
+-e, --ldapdate   The ldap field with the date time that is considered to check for
+                 new accounts. Default is set via \"report_ldapaccounts | datefieldsync\".
 -h, --help       Print out this help.
 -m, --ldapmail   The ldap mail field where to look up emails. If not set
                  the setting \"report_ldapaccounts | ldapmailfield\" is used.
@@ -111,6 +115,7 @@ $admin = get_admin();
 $authmethod = $options['authmethod'] ?: config::get_instance()->get_setting('syncauthmethod');
 $usernamefield = $options['username'] ?: config::get_instance()->get_setting('ldapusernamefield');
 $mailfield = $options['ldapmail'] ?: config::get_instance()->get_setting('ldapmailfield');
+$datefield = $options['ldapdate'] ?: config::get_instance()->get_setting('datefieldsync');
 $ldapquery = $options['ldapquery'] ?: config::get_instance()->get_setting('ldapquery');
 $date = $options['date'] ?: config::get_instance()->get_last_sync_time();
 
@@ -137,6 +142,7 @@ try {
     $sync->set_queryprefix($ldapquery)
         ->set_username_field($usernamefield)
         ->set_mail_field($mailfield)
+        ->set_date_field($datefield)
         ->set_authmethod($authmethod)
         ->set_lastsync($date)
         ->exec($dryrun);

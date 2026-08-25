@@ -108,6 +108,10 @@ There is a setting `report_ldapaccounts | lastsyncrun` which is not listed on th
 admin settings page, but which is used to hold the timestamp of the last synchronization.
 The value is a unix timestamp.
 
+By default the account synchronization looks for new accounts in the LDAP, based
+on the value in "createTimestamp" field. This can be switched to "modifyTimestamp"
+which is selectable in `report_ldapaccounts | datefieldsync`.
+
 ## Privacy
 
 In general the LDAP report just fetches data from the LDAP server and lists data
@@ -338,6 +342,10 @@ Possible future changes could be:
   users.
 
 ## Version history
+
+### Current development
+- Add new setting `datefieldsync` to select between "createTimestamp" and "modifyTimestamp"
+  which accounts are selected in LDAP for synchronization.
 
 ### v1.3
 - Implement [Filter for user-defined fields #7](https://github.com/srobotta/moodle-report_ldapaccounts/issues/7)

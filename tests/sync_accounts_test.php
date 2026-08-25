@@ -122,6 +122,8 @@ final class sync_accounts_test extends \advanced_testcase {
         $this->assertEquals('(&(createTimestamp>=20260623000000Z)(uid=*))', $method->invoke($sync));
         $sync->set_queryprefix('(&(objectClass=person)(objectClass=top))');
         $this->assertEquals('(&(&(objectClass=person)(objectClass=top))(uid=*)(createTimestamp>=20260623000000Z))', $method->invoke($sync));
+        $sync->set_date_field('modifiedTimestamp');
+        $this->assertEquals('(&(&(objectClass=person)(objectClass=top))(uid=*)(modifiedTimestamp>=20260623000000Z))', $method->invoke($sync));
     }
 
     /**
@@ -162,6 +164,28 @@ final class sync_accounts_test extends \advanced_testcase {
         set_config('ldapmailfield', 'emailaddress', 'report_ldapaccounts');
         $this->reset_config_singleton();
         $this->assertSame('emailaddress', (new sync_accounts())->get_mail_field());
+    }
+
+    /**
+     * Test the date field getter/setter. When nothing is set the value falls
+     * back to the datefieldsync setting (which defaults to "createDatetime").
+     *
+     * @covers \report_ldapaccounts\sync_accounts::set_date_field
+     * @covers \report_ldapaccounts\sync_accounts::get_date_field
+     */
+    public function test_date_field_getter_setter(): void {
+        $sync = new sync_accounts();
+        $this->assertInstanceOf(sync_accounts::class, $sync->set_date_field('somedatefield'));
+        $this->assertSame('somedatefield', $sync->get_date_field());
+
+        // Default setting value.
+        $this->reset_config_singleton();
+        $this->assertSame('createTimestamp', (new sync_accounts())->get_date_field());
+
+        // Configured value.
+        set_config('datefieldsync', 'mydatefield', 'report_ldapaccounts');
+        $this->reset_config_singleton();
+        $this->assertSame('mydatefield', (new sync_accounts())->get_date_field());
     }
 
     /**

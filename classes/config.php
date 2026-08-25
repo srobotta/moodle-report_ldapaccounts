@@ -54,6 +54,7 @@ class config {
         'ldapusernamefield' => ['', PARAM_RAW_TRIMMED, 1],
         'ldapquery' => ['', PARAM_RAW_TRIMMED, 1],
         'syncauthmethod' => ['', PARAM_RAW_TRIMMED, 1],
+        'datefieldsync' => ['createTimestamp', PARAM_RAW_TRIMMED, 1],
     ];
 
     /**
@@ -251,6 +252,14 @@ class config {
                     get_string($key . '_desc', 'report_ldapaccounts'),
                     $tuple[0],
                     $authmethods
+                ));
+            } else if ($key === 'datefieldsync') {
+                $settings->add(new \admin_setting_configselect(
+                    'report_ldapaccounts/' . $key,
+                    get_string($key, 'report_ldapaccounts'),
+                    get_string($key . '_desc', 'report_ldapaccounts'),
+                    $tuple[0],
+                    ['createTimestamp', 'modifyTimestamp']
                 ));
             } else {
                 $configclass = $tuple[1] === PARAM_BOOL ? '\admin_setting_configcheckbox' : '\admin_setting_configtext';

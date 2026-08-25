@@ -55,6 +55,12 @@ class sync_accounts {
     private $authmethod;
 
     /**
+     * LDAP field with the date time to check for new accounts.
+     * @var string
+     */
+    private $datefieldsync;
+
+    /**
      * Last sync time.
      * @var int
      */
@@ -105,6 +111,31 @@ class sync_accounts {
             return (string)config::get_instance()->get_setting('ldapmailfield');
         }
         return $this->mailfield;
+    }
+
+    /**
+     * Set the field name in LDAP where the date is stored to be used to check
+     * for new accounts.
+     *
+     * @param string $field
+     * @return self
+     */
+    public function set_date_field(string $field): self {
+        $this->datefieldsync = $field;
+        return $this;
+    }
+
+    /**
+     * Get the field name in LDAP where the date is stored.
+     * Default is the setting report_ldapaccounts | datefieldsync
+     *
+     * @return string
+     */
+    public function get_date_field(): string {
+        if ($this->datefieldsync === null) {
+            return (string)config::get_instance()->get_setting('datefieldsync');
+        }
+        return $this->datefieldsync;
     }
 
     /**
@@ -343,11 +374,12 @@ class sync_accounts {
         $lastsync = $this->get_lastsync();
         $fixedquery = $this->get_queryprefix();
         $querystring = "({$this->get_username_field()}=*)";
+        $datefield = $this->get_date_field();
         if (!empty($fixedquery)) {
             $querystring = "(&{$fixedquery}{$querystring})";
         }
         if ($lastsync > 0) {
-            $date = '(createTimestamp>=' . date('YmdHis', $lastsync) . 'Z)';
+            $date = '(' . $datefield . '>=' . date('YmdHis', $lastsync) . 'Z)';
             if (str_starts_with($querystring, '(&')) {
                 $querystring = substr($querystring, 0, -1) . $date . ')';
             } else {
