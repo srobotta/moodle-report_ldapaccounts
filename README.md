@@ -1,8 +1,8 @@
 # Report LDAP User Accounts
 
-![Release](https://img.shields.io/badge/Release-1.3-blue.svg)
+![Release](https://img.shields.io/badge/Release-1.4-blue.svg)
 [![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml)
-[![Moodle Support](https://img.shields.io/badge/Moodle-4.1+-orange)](https://moodledev.io/general/releases)
+[![Moodle Support](https://img.shields.io/badge/Moodle-4.5+-orange)](https://moodledev.io/general/releases)
 [![License GPL-3.0](https://img.shields.io/github/license/srobotta/moodle-report_ldapaccounts?color=lightgrey)](https://github.com/srobotta/moodle-report_ldapaccounts/blob/master/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/srobotta/moodle-report_ldapaccounts)](https://github.com/srobotta/moodle-report_ldapaccounts/graphs/contributors)
 
@@ -343,9 +343,10 @@ Possible future changes could be:
 
 ## Version history
 
-### Current development
+### v1.4
 - Add new setting `datefieldsync` to select between "createTimestamp" and "modifyTimestamp"
   which accounts are selected in LDAP for synchronization.
+- Minimum required version of Moodle is 4.5 now.
 
 ### v1.3
 - Implement [Filter for user-defined fields #7](https://github.com/srobotta/moodle-report_ldapaccounts/issues/7)
