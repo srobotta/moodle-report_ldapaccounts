@@ -263,6 +263,9 @@ class config {
                 ));
             } else {
                 $configclass = $tuple[1] === PARAM_BOOL ? '\admin_setting_configcheckbox' : '\admin_setting_configtext';
+                if ($key === 'ldappass') {
+                    $configclass = 'admin_setting_configpasswordunmask';
+                }
                 $settings->add(new $configclass(
                     'report_ldapaccounts/' . $key,
                     get_string($key, 'report_ldapaccounts'),
