@@ -188,7 +188,7 @@ class user_table {
             if (\in_array($col, ['currentlogin', 'lastlogin', 'timecreted', 'timemodified', 'firstaccess', 'lastaccess'])) {
                 $cell = !empty($user->{$col}) ? userdate_htmltime($user->{$col}) : '';
             } else {
-                $cell = $user->{$col} ?? '';
+                $cell = format_string($user->{$col}) ?? '';
             }
             $row[] = (int)$user->deleted === 1 ? '<s>' . $cell . '</s>' : $cell;
         }
