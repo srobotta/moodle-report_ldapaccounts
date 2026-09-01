@@ -194,7 +194,7 @@ class user_table {
         }
         if ($this->showactionprofile) {
             $row[] = (int)$user->deleted === 1 ? '' :
-                '<a href="' . $CFG->httpswwwroot
+                '<a href="' . $CFG->wwwroot
                     . '/user/profile.php?id=' . $user->id . '" target="blank"><i title="'
                     . htmlspecialchars(get_string('userdetails', 'core'))
                     . '" class="icon fa fa-cog fa-fw" rolw="img" aria-label="'
@@ -203,7 +203,7 @@ class user_table {
         }
         if ($this->showactiondelete) {
             $row[] = (int)$user->deleted === 1 ? '' :
-                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?delete='
+                '<a href="' . $CFG->wwwroot . '/admin/user.php?delete='
                     . $user->id . '&sesskey=' . sesskey() . '" target="blank"><i title="'
                     . htmlspecialchars(get_string('delete', 'core'))
                     . '" class="icon fa fa-trash fa-fw" role="img" aria-label="'
@@ -219,7 +219,7 @@ class user_table {
                 $icon = 'fa-eye';
             }
             $row[] = (int)$user->deleted === 1 ? '' :
-                '<a href="' . $CFG->httpswwwroot . '/admin/user.php?'
+                '<a href="' . $CFG->wwwroot . '/admin/user.php?'
                     . $action . '=' . $user->id . '&sesskey=' . sesskey() . '" target="blank"><i title="'
                     . htmlspecialchars(get_string($action . 'user', 'admin'))
                     . '" class="icon fa ' . $icon . ' fa-fw" role="img" aria-label="'
@@ -231,7 +231,7 @@ class user_table {
                 ? htmlspecialchars(get_string('emailstop', 'core'))
                 : htmlspecialchars(get_string('enable_emailstop', 'report_ldapaccounts'));
             $row[] = (int)$user->deleted === 1 ? '' :
-                '<a href="' . $CFG->httpswwwroot . '/message/notificationpreferences.php?userid='
+                '<a href="' . $CFG->wwwroot . '/message/notificationpreferences.php?userid='
                     . $user->id . '" target="blank"><i title="' . $label
                     . '" class="icon fa fa-envelope fa-fw ' . ($user->emailstop ? 'btn-secondary' : '')
                     . '" role="img" aria-label="' . $label . '"></i></a>';
