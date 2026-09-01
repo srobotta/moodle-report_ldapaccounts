@@ -1,6 +1,6 @@
 # Report LDAP User Accounts
 
-![Release](https://img.shields.io/badge/Release-1.4-blue.svg)
+![Release](https://img.shields.io/badge/Release-1.5-blue.svg)
 [![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml)
 [![Moodle Support](https://img.shields.io/badge/Moodle-4.5+-orange)](https://moodledev.io/general/releases)
 [![License GPL-3.0](https://img.shields.io/github/license/srobotta/moodle-report_ldapaccounts?color=lightgrey)](https://github.com/srobotta/moodle-report_ldapaccounts/blob/master/LICENSE)
@@ -342,6 +342,13 @@ Possible future changes could be:
   users.
 
 ## Version history
+
+### v1.5
+- Add more unit tests to broaden the test coverage.
+- Fix issue with LDAP search when setting `ldapquery` was set.
+- Fix several glitches that MDLShield detected.
+- Fix XSS vulnerability in custom user field (detected by MDLShield)
+- Prevent spreadsheet formula injection (detected by MDLShield)
 
 ### v1.4
 - Add new setting `datefieldsync` to select between "createTimestamp" and "modifyTimestamp"

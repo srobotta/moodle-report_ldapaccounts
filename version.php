@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->release = 'v1.4';
-$plugin->version = 2026082500;   // YYYYMMDDHH (year, month, day, 24-hr time).
+$plugin->release = 'v1.5';
+$plugin->version = 2026090100;   // YYYYMMDDHH (year, month, day, 24-hr time).
 $plugin->requires = 2024100700;   // YYYYMMDDHH (This is the release version for Moodle 4.1).
 $plugin->component = 'report_ldapaccounts'; // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_STABLE;
