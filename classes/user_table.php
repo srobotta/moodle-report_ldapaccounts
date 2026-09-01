@@ -396,6 +396,11 @@ class user_table {
             $raw = $row;
         }
         foreach (\array_keys($raw) as $i) {
+            $raw[$i] = trim($raw[$i]);
+            // If empty value, we need no further checks or reformating.
+            if ($raw[$i] === '') {
+                continue;
+            }
             if (strpos($raw[$i], '<time') === 0) {
                 $raw[$i] = strip_tags($raw[$i]);
             } else if (strpos($raw[$i], '<a ') === 0) {
@@ -404,6 +409,10 @@ class user_table {
                 if ($end !== false) {
                     $raw[$i] = substr($raw[$i], $start + 6, $end - $start - 6);
                 }
+            }
+            // Prevent spreadsheet formula injection.
+            if (\in_array($raw[$i][0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                $raw[$i] = "'" . $raw[$i];
             }
         }
         return $raw;
