@@ -185,7 +185,7 @@ class user_table {
 
         $row = [];
         foreach ($this->colunms as $col) {
-            if (\in_array($col, ['currentlogin', 'lastlogin', 'timecreted', 'timemodified', 'firstaccess', 'lastaccess'])) {
+            if (\in_array($col, ['currentlogin', 'lastlogin', 'timecreated', 'timemodified', 'firstaccess', 'lastaccess'])) {
                 $cell = !empty($user->{$col}) ? userdate_htmltime($user->{$col}) : '';
             } else {
                 $cell = format_string($user->{$col}) ?? '';

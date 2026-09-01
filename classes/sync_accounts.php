@@ -286,7 +286,7 @@ class sync_accounts {
                             : '';
                     } else {
                         $authplugin = get_auth_plugin($authmethod);
-                        $newpassword = !empty($user->newpassword) ? hash_internal_user_password($usernew->newpassword) : '';
+                        $newpassword = !empty($user->newpassword) ? hash_internal_user_password($user->newpassword) : '';
                     }
                     unset($user->newpassword);
                     $user = $this->create_new_user($user, $authplugin, $newpassword);

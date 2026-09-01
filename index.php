@@ -35,7 +35,7 @@ if (!has_capability('report/ldapaccounts:view', context_system::instance())) {
 
 // Parameters that may come within the request.
 $csv = optional_param('csv', '', PARAM_ALPHANUM);
-$permalink = optional_param('permalink', '', PARAM_ALPHANUM);
+$permalink = optional_param('permalink', '', PARAM_RAW_TRIMMED);
 
 // CSV Download was triggered.
 if (!empty($csv)) {
