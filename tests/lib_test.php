@@ -69,12 +69,6 @@ final class lib_test extends \advanced_testcase {
      * @covers \report_ldapaccounts\ldap::get_parsed_result()
      */
     public function test_ldap_search_and_result_parsing_with_mocked_ldap(): void {
-        set_config('ldapserver', 'example.com', 'report_ldapaccounts');
-        set_config('ldapbasedn', 'dc=example,dc=com', 'report_ldapaccounts');
-        set_config('ldapuser', 'cn=admin,dc=example,dc=com', 'report_ldapaccounts');
-        set_config('ldappass', 'pass', 'report_ldapaccounts');
-        set_config('ldapport', 389, 'report_ldapaccounts');
-
         mock_ldap::$entries = [
             'count' => 1,
             0 => [
@@ -95,6 +89,28 @@ final class lib_test extends \advanced_testcase {
         $this->assertCount(1, $parsed);
         $this->assertSame('Alice', $parsed[0]['cn']);
         $this->assertSame('alice@example.com', $parsed[0]['mail']);
+
+        $ldap->search(['sn' => ['Alice', 'Bob']], ['cn', 'mail'], null, 10);
+        $this->assertSame('(|(sn=Alice)(sn=Bob))', mock_ldap::$lastfilter);
+    }
+
+    /**
+     * Test the basic functionality of the ldap class.
+     *
+     * @covers \report_ldapaccounts\ldap::search()
+     */
+    public function test_ldap_search_and_filter_with_mocked_ldap(): void {
+        set_config('ldapserver', 'example.org', 'report_ldapaccounts');
+        set_config('ldapbasedn', 'dc=example,dc=com', 'report_ldapaccounts');
+        set_config('ldapuser', 'cn=admin,dc=example,dc=com', 'report_ldapaccounts');
+        set_config('ldappass', 'pass', 'report_ldapaccounts');
+        set_config('ldapport', 389, 'report_ldapaccounts');
+        set_config('ldapquery', '(&(objectClass=person)(objectClass=top))', 'report_ldapaccounts');
+
+        $ldap = ldap::init_from_config();
+        $ldap->search(['sn' => ['Alice', 'Bob']], ['cn', 'mail'], config::get_instance()->get_setting('ldapquery'), 10);
+        $this->assertSame('(&(&(objectClass=person)(objectClass=top))(|(sn=Alice)(sn=Bob)))', mock_ldap::$lastfilter);
+        $this->assertSame(['cn', 'mail'], mock_ldap::$lastattributes);
     }
 
     /**
@@ -179,7 +195,6 @@ final class lib_test extends \advanced_testcase {
      * @covers \report_ldapaccounts\user_table::output_csv()
      */
     public function test_user_table_columns_and_csv_output(): void {
-        global $CFG;
         $table = new user_table();
         $table->set_columns(['id', 'password', 'secret', 'email']);
 

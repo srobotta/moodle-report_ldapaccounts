@@ -280,7 +280,9 @@ class ldap {
      * @return ldap
      */
     public function search($searchfields, $resultfields = null, ?string $fixedquerypart = null, int $size = -1): ldap {
-        $filter = $fixedquerypart . $this->get_filter($searchfields);
+        $filter = !empty($fixedquerypart)
+            ? '(&' .$fixedquerypart . $this->get_filter($searchfields) . ')'
+            : $this->get_filter($searchfields);
         $justthese = $this->get_result_fields($resultfields);
         $search = ldap_search($this->get_connection(), $this->basedn, $filter, $justthese, 0, $size);
         if (!$search) {
