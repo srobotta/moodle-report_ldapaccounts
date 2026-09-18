@@ -2,6 +2,7 @@
 
 ![Release](https://img.shields.io/badge/Release-1.5-blue.svg)
 [![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml)
+[![MDL Shield](https://img.shields.io/endpoint?url=https%3A%2F%2Fmdlshield.com%2Fapi%2Fbadge%2Freport_ldapaccounts)](https://mdlshield.com/plugins/report_ldapaccounts)
 [![Moodle Support](https://img.shields.io/badge/Moodle-4.5+-orange)](https://moodledev.io/general/releases)
 [![License GPL-3.0](https://img.shields.io/github/license/srobotta/moodle-report_ldapaccounts?color=lightgrey)](https://github.com/srobotta/moodle-report_ldapaccounts/blob/master/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/srobotta/moodle-report_ldapaccounts)](https://github.com/srobotta/moodle-report_ldapaccounts/graphs/contributors)
