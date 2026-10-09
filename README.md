@@ -1,6 +1,6 @@
 # Report LDAP User Accounts
 
-![Release](https://img.shields.io/badge/Release-1.5-blue.svg)
+![Release](https://img.shields.io/badge/Release-1.6-blue.svg)
 [![Moodle Plugin CI](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml/badge.svg)](https://github.com/srobotta/moodle-report_ldapaccounts/actions/workflows/moodle-plugin-ci.yml)
 [![MDL Shield](https://img.shields.io/endpoint?url=https%3A%2F%2Fmdlshield.com%2Fapi%2Fbadge%2Freport_ldapaccounts)](https://mdlshield.com/plugins/report_ldapaccounts)
 [![Moodle Support](https://img.shields.io/badge/Moodle-4.5+-orange)](https://moodledev.io/general/releases)
@@ -343,6 +343,9 @@ Possible future changes could be:
   users.
 
 ## Version history
+
+### v1.6
+- Add Support for Moodle 5.3.
 
 ### v1.5
 - Add more unit tests to broaden the test coverage.
