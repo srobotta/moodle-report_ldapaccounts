@@ -87,15 +87,13 @@ Options:
 -d, --delimiter  CSV delimiter, can be one of ; , | ~ : tab
                  If not set, the semicolon is used.
 -f, --filter     Filter which users to select. Think of an array such as:
-                 only active users: ['deleted' => 0]
+                 only active users: {\"deleted\":0}
                  only users with email ending in example.org:
-                 ['email' => '*example.org']
-                 only users with id > than 100: ['id' => '>100']
+                 {\"email\": \"*example.org\"}
+                 only users with id > than 100: {\"id\": \">100\"}
                  You may also combine these:
-                 ['deleted' => 0, 'email' => '*example.org']
-                 Take this string and convert it into a json. The correct
-                 filter argument for the above should
-                 look like this: {\"deleted\":0,\"email\":\"*example.org\"}
+                 {\"deleted\": 0, \"email\": \"*example.org\"}
+                 The filter value must be written as a parsable json string.
                  Fields that can be used are all columns inside the user
                  table or custom profile fields using the profile_field_ prefix.
 -h, --help       Print out this help
