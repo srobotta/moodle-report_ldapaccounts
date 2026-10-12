@@ -110,6 +110,11 @@ class config {
                 } else if ($paramtype === PARAM_BOOL) {
                     $this->values[$shortkey] = (bool)$this->values[$shortkey];
                 }
+                // Workaround for datefieldsync
+                if (($key === 'datefieldsync') && \in_array($this->values[$shortkey], ['0', '1'])) {
+                    $fieldnames = ['createTimestamp', 'modifyTimestamp'];
+                    $this->values[$shortkey] = $fieldnames[(int)$this->values[$shortkey]];
+                }
             }
             // This key is not visible in the settings, hence cannot be configured in the admin interface.
             $this->values['lastsyncrun'] = isset($stored->lastsyncrun) ? (int)$stored->lastsyncrun : 0;

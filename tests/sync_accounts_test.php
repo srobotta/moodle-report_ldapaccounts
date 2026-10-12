@@ -186,6 +186,15 @@ final class sync_accounts_test extends \advanced_testcase {
         set_config('datefieldsync', 'mydatefield', 'report_ldapaccounts');
         $this->reset_config_singleton();
         $this->assertSame('mydatefield', (new sync_accounts())->get_date_field());
+
+        // Test for the bugfix because the selection for datefieldsync stored 0 and 1.
+        set_config('datefieldsync', '1', 'report_ldapaccounts');
+        $this->reset_config_singleton();
+        $this->assertSame('modifyTimestamp', (new sync_accounts())->get_date_field());
+        set_config('datefieldsync', '0', 'report_ldapaccounts');
+        $this->reset_config_singleton();
+        $this->assertSame('createTimestamp', (new sync_accounts())->get_date_field());
+
     }
 
     /**
